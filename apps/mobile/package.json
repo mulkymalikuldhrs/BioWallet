@@ -1,0 +1,41 @@
+{
+  "name": "mobile",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@react-navigation/bottom-tabs": "^6.5.0",
+    "@react-navigation/native": "^6.1.0",
+    "@react-navigation/native-stack": "^6.9.0",
+    "argon2-browser": "^1.18.0",
+    "biometric-core": "*",
+    "ethers": "^6.0.0",
+    "expo": "~48.0.0",
+    "expo-local-authentication": "~13.3.0",
+    "expo-secure-store": "~12.1.0",
+    "expo-status-bar": "~1.4.0",
+    "react": "18.2.0",
+    "react-native": "0.71.0",
+    "react-native-biometrics": "^3.0.0",
+    "react-native-gesture-handler": "~2.9.0",
+    "react-native-reanimated": "~2.14.0",
+    "react-native-safe-area-context": "4.5.0",
+    "react-native-screens": "~3.20.0",
+    "react-native-svg": "13.4.0",
+    "shared-ui": "*",
+    "utils": "*",
+    "wallet-core": "*"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@types/react": "~18.0.0",
+    "@types/react-native": "~0.71.0",
+    "typescript": "^5.0.0"
+  },
+  "private": true
+}

@@ -1,0 +1,26 @@
+{
+  "name": "bio-wallet",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "backend/*"
+  ],
+  "scripts": {
+    "dev:mobile": "yarn workspace mobile start",
+    "dev:web": "yarn workspace web dev",
+    "dev:backend": "yarn workspace api dev",
+    "build:web": "yarn workspace web build",
+    "build:backend": "yarn workspace api build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "prisma:generate": "yarn workspace api prisma generate",
+    "prisma:migrate": "yarn workspace api prisma migrate dev",
+    "prisma:studio": "yarn workspace api prisma studio"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.0",
+    "typescript": "^5.0.0"
+  }
+}

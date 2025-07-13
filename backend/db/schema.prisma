@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String         @id @default(uuid())
+  walletAddress     String         @unique
+  publicKey         String
+  email             String?        @unique
+  deviceId          String?
+  biometricType     BiometricType
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  transactions      Transaction[]
+  referralCode      String?        @unique
+  referredBy        String?
+  referralRewards   ReferralReward[]
+  isPremium         Boolean        @default(false)
+  lastLogin         DateTime?
+}
+
+model Transaction {
+  id              String            @id @default(uuid())
+  txHash          String            @unique
+  type            TransactionType
+  token           String            @default("ETH")
+  amount          Float
+  fee             Float
+  status          TransactionStatus @default(PENDING)
+  fromAddress     String
+  toAddress       String
+  userId          String
+  user            User              @relation(fields: [userId], references: [id])
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  blockNumber     Int?
+  blockTimestamp  DateTime?
+  network         String            @default("goerli")
+}
+
+model ReferralReward {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  amount          Float
+  status          RewardStatus @default(PENDING)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model AdminStats {
+  id                String    @id @default(uuid())
+  totalUsers        Int       @default(0)
+  totalTransactions Int       @default(0)
+  totalVolume       Float     @default(0)
+  totalFees         Float     @default(0)
+  date              DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+enum BiometricType {
+  FINGERPRINT
+  FACE
+  IRIS
+}
+
+enum TransactionType {
+  SEND
+  RECEIVE
+}
+
+enum TransactionStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+enum RewardStatus {
+  PENDING
+  PAID
+  FAILED
+}

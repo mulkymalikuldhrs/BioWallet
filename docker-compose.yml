@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: biowallet-postgres
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: biowallet
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - biowallet-network
+
+  backend:
+    container_name: biowallet-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/biowallet
+      NODE_ENV: development
+      PORT: 3001
+    depends_on:
+      - postgres
+    networks:
+      - biowallet-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+networks:
+  biowallet-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
