@@ -22,8 +22,10 @@ export async function generateWalletFromBiometric(
       parallelism: 1, // Parallelism factor
     });
 
-    // Use the hash as entropy for wallet generation
-    const wallet = ethers.Wallet.fromPhrase(hashResult.encoded);
+    // Use the hash as a private key for wallet generation
+    // Ensure the hash is in the correct format (0x prefix + 64 hex characters)
+    const privateKey = `0x${hashResult.hashHex}`;
+    const wallet = new ethers.Wallet(privateKey);
     
     return wallet;
   } catch (error) {
@@ -111,6 +113,7 @@ export async function getTransactionHistory(
     // Get transactions for the address
     const transactions = [];
     for (const block of blocks) {
+      if (!block) continue;
       for (const txHash of block.transactions) {
         const tx = await provider.getTransaction(txHash);
         if (tx && (tx.from === address || tx.to === address)) {

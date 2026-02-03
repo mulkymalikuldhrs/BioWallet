@@ -1,0 +1,34 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.1] - 2025-05-22
+
+### Added
+- **Branch Consolidation**: Merged all feature branches including mobile components into main.
+- Created `packages/shared-ui` with basic React components.
+- Created `packages/utils` with utility functions (`formatAddress`, `validateEmail`).
+- Implemented `apps/web/src/pages/dashboard.tsx` for wallet management.
+- Implemented `apps/web/src/pages/login.tsx` for biometric authentication.
+- Added `apps/web/src/components/Layout.tsx` for consistent UI.
+- Added unit tests for wallet generation in `packages/wallet-core`.
+- Added `jest` and `ts-jest` for monorepo testing.
+
+### Fixed
+- **CRITICAL**: Fixed non-deterministic wallet generation by removing `Date.now()` from the biometric salt.
+- **CRITICAL**: Fixed incorrect wallet generation in `wallet-core` to use hash as a private key.
+- Fixed `next.config.js` to support WebAssembly and node modules fallback.
+
+### Improved
+- Updated `README.md` with current project architecture and unified state.
+- Integrated frontend registration with backend API.
+- Simplified UI to improve reliability across different environments.
+
+## [0.1.0] - 2025-07-13
+- Initial project structure setup.
+- Implemented backend API with Express and Prisma.
+- Created mobile app with React Native and Expo.
+- Implemented web app with Next.js and WebAuthn.

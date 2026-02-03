@@ -5,12 +5,14 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  register: () => Promise<boolean>;
+  register: (walletAddress: string, publicKey: string) => Promise<boolean>;
   login: () => Promise<boolean>;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -19,65 +21,54 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     // Check if user is authenticated
-    const checkAuth = async () => {
-      try {
-        const token = localStorage.getItem('userToken');
-        if (token) {
-          // In a real app, you would validate the token with the server
-          setIsAuthenticated(true);
-        }
-      } catch (error) {
-        console.error('Error checking authentication:', error);
-      }
-    };
-
-    checkAuth();
+    const token = localStorage.getItem('userToken');
+    if (token) {
+      setIsAuthenticated(true);
+    }
   }, []);
 
-  // Register with WebAuthn
-  const register = async (): Promise<boolean> => {
+  // Register with WebAuthn and Backend
+  const register = async (walletAddress: string, publicKey: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // In a real app, you would fetch registration options from the server
-      // This is a simplified example
+      // 1. WebAuthn Registration (Simplified for this example)
       const registrationOptions = {
-        challenge: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]),
-        rp: {
-          name: 'BioWallet',
-          id: window.location.hostname,
-        },
-        user: {
-          id: new Uint8Array([1, 2, 3, 4]),
-          name: 'user@example.com',
-          displayName: 'BioWallet User',
-        },
-        pubKeyCredParams: [
-          { type: 'public-key', alg: -7 }, // ES256
-          { type: 'public-key', alg: -257 }, // RS256
-        ],
+        challenge: btoa('biowallet-challenge'),
+        rp: { name: 'BioWallet', id: window.location.hostname },
+        user: { id: btoa(walletAddress), name: walletAddress, displayName: 'BioWallet User' },
+        pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
         timeout: 60000,
-        attestation: 'none',
-        authenticatorSelection: {
-          authenticatorAttachment: 'platform',
-          userVerification: 'required',
-          requireResidentKey: false,
-        },
+        authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required' },
       };
 
-      // Start registration
       const credential = await startRegistration(registrationOptions as any);
 
-      // In a real app, you would send the credential to the server for verification
-      // This is a simplified example
-      console.log('Registration credential:', credential);
+      // 2. Call Backend API
+      const response = await fetch(`${API_URL}/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          walletAddress,
+          publicKey,
+          biometricType: 'FINGERPRINT', // Default for web platform
+          deviceId: localStorage.getItem('deviceId'),
+        }),
+      });
 
-      // Store authentication state
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to register on backend');
+      }
+
+      const userData = await response.json();
+
+      // Store state
+      localStorage.setItem('userToken', userData.id);
       localStorage.setItem('isRegistered', 'true');
-      localStorage.setItem('userToken', 'dummy-token');
-
       setIsAuthenticated(true);
+
       return true;
     } catch (error) {
       console.error('Error registering:', error);
@@ -94,31 +85,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setError(null);
 
     try {
-      // Check if registered
       const isRegistered = localStorage.getItem('isRegistered');
       if (isRegistered !== 'true') {
         throw new Error('Not registered. Please register first');
       }
 
-      // In a real app, you would fetch authentication options from the server
-      // This is a simplified example
       const authenticationOptions = {
-        challenge: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]),
+        challenge: btoa('biowallet-login-challenge'),
         timeout: 60000,
         userVerification: 'required',
         rpId: window.location.hostname,
       };
 
-      // Start authentication
-      const credential = await startAuthentication(authenticationOptions as any);
+      await startAuthentication(authenticationOptions as any);
 
-      // In a real app, you would send the credential to the server for verification
-      // This is a simplified example
-      console.log('Authentication credential:', credential);
-
-      // Store authentication state
-      localStorage.setItem('userToken', 'dummy-token');
-
+      // In a real app, you would verify this with the backend
+      localStorage.setItem('userToken', 'session-token');
       setIsAuthenticated(true);
       return true;
     } catch (error) {
@@ -130,32 +112,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Logout
   const logout = async (): Promise<void> => {
-    setIsLoading(true);
-
-    try {
-      localStorage.removeItem('userToken');
-      setIsAuthenticated(false);
-    } catch (error) {
-      console.error('Error logging out:', error);
-      setError(error instanceof Error ? error.message : 'Logout failed');
-    } finally {
-      setIsLoading(false);
-    }
+    localStorage.removeItem('userToken');
+    setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        isAuthenticated,
-        isLoading,
-        error,
-        register,
-        login,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={{ isAuthenticated, isLoading, error, register, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -163,8 +126,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (context === undefined) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
