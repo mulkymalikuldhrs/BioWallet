@@ -5,7 +5,7 @@ import { BiometricType } from '@prisma/client';
 // Create a new user
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const { walletAddress, publicKey, email, deviceId, biometricType } = req.body;
+    const { walletAddress, publicKey, email, deviceId, biometricType, referredBy } = req.body;
 
     // Validate required fields
     if (!walletAddress || !publicKey || !biometricType) {
@@ -32,14 +32,16 @@ export const createUser = async (req: Request, res: Response) => {
         email,
         deviceId,
         biometricType: biometricType as BiometricType,
-        referralCode
+        referralCode,
+        referredBy
       }
     });
 
     res.status(201).json({
       id: user.id,
       walletAddress: user.walletAddress,
-      referralCode: user.referralCode
+      referralCode: user.referralCode,
+      message: 'User registered successfully'
     });
   } catch (error) {
     console.error('Error creating user:', error);
@@ -47,13 +49,18 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
-// Get user by ID
+// Get user by ID or Wallet Address
 export const getUserById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { identifier } = req.params;
 
-    const user = await prisma.user.findUnique({
-      where: { id },
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { id: identifier },
+          { walletAddress: identifier }
+        ]
+      },
       select: {
         id: true,
         walletAddress: true,

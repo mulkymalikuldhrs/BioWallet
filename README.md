@@ -14,29 +14,29 @@ BioWallet is a revolutionary crypto wallet that uses human biometrics (fingerpri
 
 ## Features
 
-- **Biometric Authentication**: Use your fingerprint, face, or iris to secure your wallet
-- **No Seed Phrases**: Never worry about losing or forgetting your seed phrase
-- **Cross-Platform**: Available on Android, iOS, and Web
-- **Local Biometric Processing**: All biometric data is processed locally on your device
-- **Ethereum Compatible**: Send and receive ETH and ERC-20 tokens
-- **Beautiful UI/UX**: Intuitive and user-friendly interface
-- **Secure Key Derivation**: Deterministic key generation from biometric data
-- **Referral System**: Built-in referral system to grow the user base
-- **Transaction History**: View all your transactions in one place
-- **Admin Dashboard**: Comprehensive admin dashboard for monitoring and analytics
+- **Biometric Authentication**: Use your fingerprint, face, or iris to secure your wallet.
+- **Deterministic Key Derivation**: Biometric data is used to derive a deterministic private key via SHA-256/Argon2 hashing.
+- **No Seed Phrases**: Never worry about losing or forgetting your seed phrase.
+- **Cross-Platform**: Available on Web (Next.js) and Mobile (React Native + Expo).
+- **Local Biometric Processing**: All biometric data is processed locally on your device.
+- **Ethereum Compatible**: Send and receive ETH and ERC-20 tokens.
+- **Beautiful UI/UX**: Intuitive and user-friendly interface with Tailwind CSS and Framer Motion.
+- **Referral System**: Built-in referral system to grow the user base.
+- **Transaction History**: View all your transactions in one place.
+- **Admin Dashboard**: Comprehensive admin dashboard for monitoring and analytics.
 
 ## Architecture
 
-BioWallet is built as a monorepo with the following components:
+BioWallet is built as a monorepo using Yarn Workspaces:
 
-- **Mobile App**: React Native + Expo
-- **Web App**: Next.js + WebAuthn
-- **Backend API**: Express + Prisma + PostgreSQL
-- **Shared Packages**:
-  - `wallet-core`: Ethereum wallet functionality
-  - `biometric-core`: Biometric processing
-  - `shared-ui`: Shared UI components
-  - `utils`: Utility functions
+- **apps/web**: Next.js application with WebAuthn integration.
+- **apps/mobile**: React Native + Expo mobile application.
+- **backend/api**: Express API with Prisma ORM and PostgreSQL.
+- **backend/db**: Prisma schema and database migrations.
+- **packages/wallet-core**: Core Ethereum wallet logic and key derivation.
+- **packages/biometric-core**: WebAuthn and biometric processing logic.
+- **packages/shared-ui**: Shared React components.
+- **packages/utils**: Common utility functions.
 
 ## Blueprint
 
@@ -84,9 +84,9 @@ The BioWallet system architecture follows these key principles:
 
 ### Prerequisites
 
-- Node.js 14+
-- Yarn or npm
-- Docker and Docker Compose (for development)
+- Node.js 18+
+- Yarn
+- Docker and Docker Compose
 
 ### Installation
 
@@ -101,14 +101,17 @@ The BioWallet system architecture follows these key principles:
    yarn install
    ```
 
-3. Start the development environment:
+3. Setup environment variables:
+   Create `.env` in `backend/api` and `apps/web`.
+
+4. Start the development environment:
    ```
    yarn docker:up
    yarn prisma:generate
    yarn prisma:migrate
    ```
 
-4. Start the applications:
+5. Start the applications:
    ```
    # Backend API
    yarn dev:backend
@@ -120,54 +123,19 @@ The BioWallet system architecture follows these key principles:
    yarn dev:mobile
    ```
 
-## Development
-
-### Mobile App
-
-The mobile app is built with React Native and Expo. To start the development server:
+### Running Tests
 
 ```
-yarn dev:mobile
+yarn test
 ```
 
-### Web App
+## Recent Improvements (v0.1.1)
 
-The web app is built with Next.js. To start the development server:
-
-```
-yarn dev:web
-```
-
-### Backend API
-
-The backend API is built with Express and Prisma. To start the development server:
-
-```
-yarn dev:backend
-```
-
-## Security
-
-BioWallet takes security seriously:
-
-1. **Local Processing**: All biometric data is processed locally on your device
-2. **No Storage**: Biometric data is never stored or transmitted
-3. **Deterministic Key Derivation**: Biometric data is used to derive a deterministic key
-4. **Encryption**: All sensitive data is encrypted
-5. **WebAuthn**: Uses the Web Authentication API for secure biometric authentication
-6. **No Seed Phrases**: Eliminates the risk of lost or stolen seed phrases
-
-## Changelog
-
-### v0.1.0 (2025-07-13)
-- Initial project structure setup
-- Implemented backend API with Express and Prisma
-- Created mobile app with React Native and Expo
-- Implemented web app with Next.js and WebAuthn
-- Added biometric authentication for key derivation
-- Implemented Ethereum wallet functionality
-- Added transaction history and user management
-- Created admin dashboard for monitoring and analytics
+- **Consolidated Branch State**: Merged all feature branches into a single unified codebase.
+- **Deterministic Wallet Generation**: Fixed a bug where `Date.now()` was used in the salt, causing non-deterministic wallet addresses.
+- **Improved Key Derivation**: Updated `wallet-core` to correctly derive Ethereum private keys from biometric hashes.
+- **Infrastructure**: Added `shared-ui` and `utils` packages for better code reuse.
+- **Frontend**: Fully implemented Web Dashboard, Login, and Registration flows.
 
 ## TODO: Next Implementation
 
@@ -340,7 +308,7 @@ BioWallet takes security seriously:
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
 
 ## Credits
 
