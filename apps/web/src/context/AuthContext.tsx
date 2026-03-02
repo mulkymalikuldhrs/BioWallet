@@ -5,12 +5,16 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  register: () => Promise<boolean>;
-  login: () => Promise<boolean>;
+  register: (walletAddress: string, publicKey: string, credentialId: string) => Promise<boolean>;
+  login: () => Promise<{ success: boolean; credentialId?: string }>;
   logout: () => Promise<void>;
+  getRegistrationOptions: (walletAddress: string) => any;
+  getAuthenticationOptions: () => any;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -18,66 +22,70 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if user is authenticated
-    const checkAuth = async () => {
-      try {
-        const token = localStorage.getItem('userToken');
-        if (token) {
-          // In a real app, you would validate the token with the server
-          setIsAuthenticated(true);
-        }
-      } catch (error) {
-        console.error('Error checking authentication:', error);
-      }
-    };
-
-    checkAuth();
+    const token = localStorage.getItem('userToken');
+    if (token) {
+      setIsAuthenticated(true);
+    }
   }, []);
 
-  // Register with WebAuthn
-  const register = async (): Promise<boolean> => {
+  const getRegistrationOptions = (walletAddress: string) => {
+    const randomChallenge = new Uint8Array(32);
+    window.crypto.getRandomValues(randomChallenge);
+
+    return {
+      challenge: btoa(String.fromCharCode.apply(null, Array.from(randomChallenge))),
+      rp: { name: 'BioWallet', id: window.location.hostname },
+      user: { id: btoa(walletAddress), name: walletAddress, displayName: 'BioWallet User' },
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+      timeout: 60000,
+      authenticatorSelection: {
+        authenticatorAttachment: 'platform',
+        userVerification: 'required',
+        residentKey: 'required'
+      },
+    };
+  };
+
+  const getAuthenticationOptions = () => {
+    const randomChallenge = new Uint8Array(32);
+    window.crypto.getRandomValues(randomChallenge);
+
+    return {
+      challenge: btoa(String.fromCharCode.apply(null, Array.from(randomChallenge))),
+      timeout: 60000,
+      userVerification: 'required',
+      rpId: window.location.hostname,
+    };
+  };
+
+  const register = async (walletAddress: string, publicKey: string, credentialId: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // In a real app, you would fetch registration options from the server
-      // This is a simplified example
-      const registrationOptions = {
-        challenge: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]),
-        rp: {
-          name: 'BioWallet',
-          id: window.location.hostname,
-        },
-        user: {
-          id: new Uint8Array([1, 2, 3, 4]),
-          name: 'user@example.com',
-          displayName: 'BioWallet User',
-        },
-        pubKeyCredParams: [
-          { type: 'public-key', alg: -7 }, // ES256
-          { type: 'public-key', alg: -257 }, // RS256
-        ],
-        timeout: 60000,
-        attestation: 'none',
-        authenticatorSelection: {
-          authenticatorAttachment: 'platform',
-          userVerification: 'required',
-          requireResidentKey: false,
-        },
-      };
+      const response = await fetch(`${API_URL}/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          walletAddress,
+          publicKey,
+          credentialId,
+          biometricType: 'FINGERPRINT',
+          deviceId: localStorage.getItem('deviceId') || crypto.randomUUID(),
+        }),
+      });
 
-      // Start registration
-      const credential = await startRegistration(registrationOptions as any);
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to register on backend');
+      }
 
-      // In a real app, you would send the credential to the server for verification
-      // This is a simplified example
-      console.log('Registration credential:', credential);
-
-      // Store authentication state
+      const userData = await response.json();
+      localStorage.setItem('userToken', userData.id);
       localStorage.setItem('isRegistered', 'true');
-      localStorage.setItem('userToken', 'dummy-token');
-
+      localStorage.setItem('credentialId', credentialId);
       setIsAuthenticated(true);
+
       return true;
     } catch (error) {
       console.error('Error registering:', error);
@@ -88,74 +96,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Login with WebAuthn
-  const login = async (): Promise<boolean> => {
+  const login = async (): Promise<{ success: boolean; credentialId?: string }> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Check if registered
       const isRegistered = localStorage.getItem('isRegistered');
       if (isRegistered !== 'true') {
         throw new Error('Not registered. Please register first');
       }
 
-      // In a real app, you would fetch authentication options from the server
-      // This is a simplified example
-      const authenticationOptions = {
-        challenge: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]),
-        timeout: 60000,
-        userVerification: 'required',
-        rpId: window.location.hostname,
-      };
+      const options = getAuthenticationOptions();
+      const credential = await startAuthentication(options as any);
 
-      // Start authentication
-      const credential = await startAuthentication(authenticationOptions as any);
-
-      // In a real app, you would send the credential to the server for verification
-      // This is a simplified example
-      console.log('Authentication credential:', credential);
-
-      // Store authentication state
-      localStorage.setItem('userToken', 'dummy-token');
-
+      localStorage.setItem('userToken', 'session-token');
       setIsAuthenticated(true);
-      return true;
+      return { success: true, credentialId: credential.id };
     } catch (error) {
       console.error('Error logging in:', error);
       setError(error instanceof Error ? error.message : 'Login failed');
-      return false;
+      return { success: false };
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Logout
   const logout = async (): Promise<void> => {
-    setIsLoading(true);
-
-    try {
-      localStorage.removeItem('userToken');
-      setIsAuthenticated(false);
-    } catch (error) {
-      console.error('Error logging out:', error);
-      setError(error instanceof Error ? error.message : 'Logout failed');
-    } finally {
-      setIsLoading(false);
-    }
+    localStorage.removeItem('userToken');
+    setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        isAuthenticated,
-        isLoading,
-        error,
-        register,
-        login,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={{
+      isAuthenticated,
+      isLoading,
+      error,
+      register,
+      login,
+      logout,
+      getRegistrationOptions,
+      getAuthenticationOptions
+    }}>
       {children}
     </AuthContext.Provider>
   );
@@ -163,8 +144,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (context === undefined) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
