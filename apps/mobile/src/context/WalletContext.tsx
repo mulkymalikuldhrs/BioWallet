@@ -1,8 +1,8 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { ethers } from 'ethers';
-import * as argon2 from 'argon2-browser';
 import * as LocalAuthentication from 'expo-local-authentication';
+import { generateWalletFromBiometric as coreGenerateWallet } from 'wallet-core';
 
 interface WalletContextType {
   walletAddress: string | null;
@@ -16,9 +16,9 @@ interface WalletContextType {
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
-// Provider for Ethereum testnet (Goerli)
+// Provider for Ethereum testnet (Sepolia)
 const provider = new ethers.JsonRpcProvider(
-  'https://goerli.infura.io/v3/your-infura-key'
+  process.env.EXPO_PUBLIC_RPC_URL || 'https://rpc.ankr.com/eth_sepolia'
 );
 
 export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -80,22 +80,11 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
 
       // Generate a deterministic key from biometric authentication
-      // In a real app, you would use a more sophisticated method
-      // This is a simplified example
-      const biometricSalt = `biowallet-${deviceId}-${Date.now()}`;
+      // We use a stable biometric salt and scrypt via wallet-core
+      const biometricEntropy = `biometric-entropy-${deviceId}`;
+      const salt = 'biowallet-salt-v1';
       
-      // Hash the biometric salt using Argon2
-      const hashResult = await argon2.hash({
-        pass: biometricSalt,
-        salt: deviceId,
-        time: 3, // Number of iterations
-        mem: 4096, // Memory usage in KiB
-        hashLen: 32, // Output hash length
-        parallelism: 1, // Parallelism factor
-      });
-
-      // Use the hash as entropy for wallet generation
-      const wallet = ethers.Wallet.fromPhrase(hashResult.encoded);
+      const wallet = await coreGenerateWallet(biometricEntropy, salt);
       
       // Save wallet address to secure storage
       await SecureStore.setItemAsync('walletAddress', wallet.address);
@@ -133,24 +122,15 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
 
       // Regenerate wallet from biometric
-      // In a real app, you would implement a more secure method
       const deviceId = await SecureStore.getItemAsync('deviceId');
       if (!deviceId) {
         throw new Error('Device ID not found');
       }
 
-      const biometricSalt = `biowallet-${deviceId}-${Date.now()}`;
+      const biometricEntropy = `biometric-entropy-${deviceId}`;
+      const salt = 'biowallet-salt-v1';
       
-      const hashResult = await argon2.hash({
-        pass: biometricSalt,
-        salt: deviceId,
-        time: 3,
-        mem: 4096,
-        hashLen: 32,
-        parallelism: 1,
-      });
-
-      const wallet = ethers.Wallet.fromPhrase(hashResult.encoded);
+      const wallet = await coreGenerateWallet(biometricEntropy, salt);
       const connectedWallet = wallet.connect(provider);
 
       // Create transaction
