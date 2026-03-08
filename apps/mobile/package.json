@@ -14,7 +14,7 @@
     "@react-navigation/native-stack": "^6.9.0",
     "argon2-browser": "^1.18.0",
     "biometric-core": "*",
-    "ethers": "^6.0.0",
+    "ethers": "^6.16.0",
     "expo": "~48.0.0",
     "expo-local-authentication": "~13.3.0",
     "expo-secure-store": "~12.1.0",
