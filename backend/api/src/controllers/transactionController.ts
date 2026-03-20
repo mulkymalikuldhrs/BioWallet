@@ -98,6 +98,10 @@ export const getTransactionById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
+    if (typeof id !== 'string') {
+      return res.status(400).json({ message: 'Invalid ID' });
+    }
+
     const transaction = await prisma.transaction.findUnique({
       where: { id }
     });
@@ -118,7 +122,11 @@ export const getAllTransactions = async (req: Request, res: Response) => {
   try {
     const { userId, limit = '10', offset = '0' } = req.query;
 
-    const where = userId ? { userId: userId as string } : {};
+    if (userId && typeof userId !== 'string') {
+      return res.status(400).json({ message: 'Invalid userId' });
+    }
+
+    const where = userId ? { userId: userId } : {};
     
     const transactions = await prisma.transaction.findMany({
       where,
