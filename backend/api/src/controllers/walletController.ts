@@ -74,6 +74,10 @@ export const getWalletBalance = async (req: Request, res: Response) => {
   try {
     const { address } = req.params;
 
+    if (typeof address !== 'string') {
+      return res.status(400).json({ message: 'Invalid address' });
+    }
+
     // Validate address format
     if (!ethers.isAddress(address)) {
       return res.status(400).json({ message: 'Invalid Ethereum address' });
@@ -99,6 +103,10 @@ export const getWalletBalance = async (req: Request, res: Response) => {
 export const getWalletTransactions = async (req: Request, res: Response) => {
   try {
     const { address } = req.params;
+
+    if (typeof address !== 'string') {
+      return res.status(400).json({ message: 'Invalid address' });
+    }
 
     // Validate address format
     if (!ethers.isAddress(address)) {
