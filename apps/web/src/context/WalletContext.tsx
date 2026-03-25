@@ -1,22 +1,22 @@
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { ethers } from 'ethers';
-import * as argon2 from 'argon2-browser';
+import { generateWalletFromBiometric as coreGenerateWallet } from 'wallet-core';
 
 interface WalletContextType {
   walletAddress: string | null;
   balance: string | null;
   isLoading: boolean;
   error: string | null;
-  generateWalletFromBiometric: () => Promise<string | null>;
-  sendTransaction: (to: string, amount: string) => Promise<string | null>;
+  generateWallet: (biometricData: string, salt: string) => Promise<string | null>;
+  sendTransaction: (to: string, amount: string, biometricData: string, salt: string) => Promise<string | null>;
   refreshBalance: () => Promise<void>;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
-// Provider for Ethereum testnet (Goerli)
+// Provider for Ethereum testnet (Sepolia)
 const provider = new ethers.JsonRpcProvider(
-  'https://goerli.infura.io/v3/your-infura-key'
+  process.env.NEXT_PUBLIC_RPC_URL || 'https://rpc.ankr.com/eth_sepolia'
 );
 
 export const WalletProvider = ({ children }: { children: ReactNode }) => {
@@ -26,59 +26,29 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Load wallet address from local storage
     const loadWallet = async () => {
       try {
         const address = localStorage.getItem('walletAddress');
         if (address) {
           setWalletAddress(address);
-          await refreshBalance();
+          const bal = await provider.getBalance(address);
+          setBalance(ethers.formatEther(bal));
         }
       } catch (error) {
         console.error('Error loading wallet:', error);
-        setError('Failed to load wallet');
       }
     };
-
     loadWallet();
   }, []);
 
-  // Generate a wallet from biometric data
-  const generateWalletFromBiometric = async (): Promise<string | null> => {
+  const generateWallet = async (biometricData: string, salt: string): Promise<string | null> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Get device ID as salt
-      const deviceId = localStorage.getItem('deviceId');
-      if (!deviceId) {
-        throw new Error('Device ID not found');
-      }
-
-      // Generate a deterministic key from biometric authentication
-      // In a real app, you would use a more sophisticated method
-      // This is a simplified example
-      const biometricSalt = `biowallet-${deviceId}-${Date.now()}`;
+      const wallet = await coreGenerateWallet(biometricData, salt);
       
-      // Hash the biometric salt using Argon2
-      const hashResult = await argon2.hash({
-        pass: biometricSalt,
-        salt: deviceId,
-        time: 3, // Number of iterations
-        mem: 4096, // Memory usage in KiB
-        hashLen: 32, // Output hash length
-        parallelism: 1, // Parallelism factor
-      });
-
-      // Use the hash as entropy for wallet generation
-      const wallet = ethers.Wallet.fromPhrase(hashResult.encoded);
-      
-      // Save wallet address to local storage
       localStorage.setItem('walletAddress', wallet.address);
-      
-      // Register wallet with backend
-      // This would be implemented in a real app
-      
       setWalletAddress(wallet.address);
       await refreshBalance();
       
@@ -92,45 +62,20 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Send a transaction
-  const sendTransaction = async (to: string, amount: string): Promise<string | null> => {
+  const sendTransaction = async (to: string, amount: string, biometricData: string, salt: string): Promise<string | null> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Regenerate wallet from biometric
-      // In a real app, you would implement a more secure method
-      const deviceId = localStorage.getItem('deviceId');
-      if (!deviceId) {
-        throw new Error('Device ID not found');
-      }
+      const walletWithProvider = (await coreGenerateWallet(biometricData, salt)).connect(provider);
 
-      const biometricSalt = `biowallet-${deviceId}-${Date.now()}`;
-      
-      const hashResult = await argon2.hash({
-        pass: biometricSalt,
-        salt: deviceId,
-        time: 3,
-        mem: 4096,
-        hashLen: 32,
-        parallelism: 1,
-      });
-
-      const wallet = ethers.Wallet.fromPhrase(hashResult.encoded);
-      const connectedWallet = wallet.connect(provider);
-
-      // Create transaction
-      const tx = await connectedWallet.sendTransaction({
+      const tx = await walletWithProvider.sendTransaction({
         to,
         value: ethers.parseEther(amount),
       });
 
-      // Wait for transaction to be mined
       await tx.wait();
-
-      // Refresh balance
       await refreshBalance();
-
       return tx.hash;
     } catch (error) {
       console.error('Error sending transaction:', error);
@@ -141,31 +86,18 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Refresh wallet balance
   const refreshBalance = async (): Promise<void> => {
     if (!walletAddress) return;
-
     try {
-      const balance = await provider.getBalance(walletAddress);
-      setBalance(ethers.formatEther(balance));
+      const bal = await provider.getBalance(walletAddress);
+      setBalance(ethers.formatEther(bal));
     } catch (error) {
       console.error('Error fetching balance:', error);
-      setError('Failed to fetch balance');
     }
   };
 
   return (
-    <WalletContext.Provider
-      value={{
-        walletAddress,
-        balance,
-        isLoading,
-        error,
-        generateWalletFromBiometric,
-        sendTransaction,
-        refreshBalance,
-      }}
-    >
+    <WalletContext.Provider value={{ walletAddress, balance, isLoading, error, generateWallet, sendTransaction, refreshBalance }}>
       {children}
     </WalletContext.Provider>
   );
@@ -173,8 +105,6 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
 export const useWallet = () => {
   const context = useContext(WalletContext);
-  if (context === undefined) {
-    throw new Error('useWallet must be used within a WalletProvider');
-  }
+  if (context === undefined) throw new Error('useWallet must be used within a WalletProvider');
   return context;
 };
