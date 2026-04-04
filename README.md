@@ -12,6 +12,12 @@ Your body is your password
 
 BioWallet is a revolutionary crypto wallet that uses human biometrics (fingerprint, face, iris) for key derivation instead of passwords or seed phrases. It provides a secure, user-friendly way to manage your cryptocurrency assets.
 
+## Recent Upgrades (v0.1.2)
+- **Monorepo Consolidation**: Unified all feature branches into a cohesive structure.
+- **Modern Tech Stack**: Upgraded to **Next.js 15**, **React 19**, **Ethers v6**, and **Prisma 6**.
+- **Enhanced Security**: Implemented WebAuthn PRF extension for high-entropy key derivation and migrated to `ethers.scrypt` for deterministic biometric-to-wallet generation.
+- **Express 5**: Backend API now runs on Express 5 with improved type safety.
+
 ## Features
 
 - **Biometric Authentication**: Use your fingerprint, face, or iris to secure your wallet
