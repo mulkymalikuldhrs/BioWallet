@@ -67,7 +67,7 @@ export const createTransaction = async (req: Request, res: Response) => {
 
     // Listen for transaction confirmation (async)
     provider.once(tx.hash, async (receipt) => {
-      if (receipt.status === 1) {
+      if (receipt && receipt.status === 1) {
         // Transaction successful
         await prisma.transaction.update({
           where: { txHash: tx.hash },
@@ -97,6 +97,10 @@ export const createTransaction = async (req: Request, res: Response) => {
 export const getTransactionById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+
+    if (typeof id !== 'string') {
+      return res.status(400).json({ message: 'Invalid ID' });
+    }
 
     const transaction = await prisma.transaction.findUnique({
       where: { id }
