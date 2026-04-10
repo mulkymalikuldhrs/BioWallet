@@ -17,10 +17,15 @@
     "docker:down": "docker-compose down",
     "prisma:generate": "yarn workspace api prisma generate",
     "prisma:migrate": "yarn workspace api prisma migrate dev",
-    "prisma:studio": "yarn workspace api prisma studio"
+    "prisma:studio": "yarn workspace api prisma studio",
+    "test": "jest"
   },
   "devDependencies": {
-    "turbo": "^1.10.0",
-    "typescript": "^5.0.0"
+    "@playwright/test": "^1.59.1",
+    "@types/jest": "^30.0.0",
+    "jest": "^30.3.0",
+    "ts-jest": "^29.4.6",
+    "turbo": "^2.0.0",
+    "typescript": "^5.7.0"
   }
 }
