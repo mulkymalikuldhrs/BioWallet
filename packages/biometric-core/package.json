@@ -10,7 +10,8 @@
   "dependencies": {
     "@simplewebauthn/browser": "^7.0.0",
     "@simplewebauthn/server": "^7.0.0",
-    "argon2-browser": "^1.18.0"
+    "argon2-browser": "^1.18.0",
+    "ethers": "^6.16.0"
   },
   "devDependencies": {
     "typescript": "^5.0.0"
