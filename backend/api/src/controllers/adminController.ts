@@ -181,7 +181,7 @@ export const getUserGrowth = async (req: Request, res: Response) => {
     // Process the data to group by period
     const groupedData: Record<string, number> = {};
     
-    users.forEach(user => {
+    users.forEach((user: { createdAt: Date }) => {
       let key: string;
       const date = new Date(user.createdAt);
       
@@ -231,7 +231,7 @@ export const getTransactionVolume = async (req: Request, res: Response) => {
     // Process the data to group by period
     const groupedData: Record<string, { volume: number, fees: number }> = {};
     
-    transactions.forEach(tx => {
+    transactions.forEach((tx: { createdAt: Date, amount: number, fee: number }) => {
       let key: string;
       const date = new Date(tx.createdAt);
       
