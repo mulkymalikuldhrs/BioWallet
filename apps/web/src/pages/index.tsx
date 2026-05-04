@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { FiFingerprint, FiShield, FiGlobe, FiLock } from 'react-icons/fi';
+import { FiShield, FiGlobe, FiLock } from 'react-icons/fi';
+import { MdFingerprint } from 'react-icons/md';
 
 export default function Home() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   
   useEffect(() => {
-    // If user is authenticated, redirect to dashboard
     if (isAuthenticated) {
       router.push('/dashboard');
     }
@@ -34,12 +34,38 @@ export default function Home() {
             </p>
           </motion.div>
           
-          <motion.div
-            className="mt-10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-          >
+          <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+              <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-4 mx-auto">
+                <MdFingerprint className="text-2xl" />
+              </div>
+              <h3 className="text-lg font-bold">Biometric Security</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">Use your device's biometric sensors to authorize transactions.</p>
+            </div>
+            <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+              <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-4 mx-auto">
+                <FiShield className="text-2xl" />
+              </div>
+              <h3 className="text-lg font-bold">Self-Custodial</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">You alone control your private keys, derived deterministically.</p>
+            </div>
+            <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+              <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-4 mx-auto">
+                <FiLock className="text-2xl" />
+              </div>
+              <h3 className="text-lg font-bold">No Seed Phrases</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">Never worry about losing your backup phrase again.</p>
+            </div>
+            <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+              <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-4 mx-auto">
+                <FiGlobe className="text-2xl" />
+              </div>
+              <h3 className="text-lg font-bold">Multi-Chain</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">Support for Ethereum, Polygon, and other EVM networks.</p>
+            </div>
+          </div>
+
+          <div className="mt-10">
             <div className="flex justify-center">
               <div className="inline-flex rounded-md shadow">
                 <button
@@ -52,87 +78,14 @@ export default function Home() {
               <div className="ml-3 inline-flex">
                 <button
                   onClick={() => router.push('/login')}
-                  className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 dark:text-indigo-100 dark:bg-indigo-900 dark:hover:bg-indigo-800"
+                  className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200"
                 >
                   Login
                 </button>
               </div>
             </div>
-          </motion.div>
-        </div>
-        
-        <motion.div
-          className="mt-20"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-        >
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="pt-6">
-              <div className="flow-root bg-gray-50 dark:bg-gray-800 rounded-lg px-6 pb-8">
-                <div className="-mt-6">
-                  <div>
-                    <span className="inline-flex items-center justify-center p-3 bg-indigo-500 rounded-md shadow-lg">
-                      <FiFingerprint className="h-6 w-6 text-white" aria-hidden="true" />
-                    </span>
-                  </div>
-                  <h3 className="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight">Biometric Security</h3>
-                  <p className="mt-5 text-base text-gray-500 dark:text-gray-400">
-                    Use your fingerprint, face, or iris to secure your wallet. No more seed phrases to remember or lose.
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="pt-6">
-              <div className="flow-root bg-gray-50 dark:bg-gray-800 rounded-lg px-6 pb-8">
-                <div className="-mt-6">
-                  <div>
-                    <span className="inline-flex items-center justify-center p-3 bg-indigo-500 rounded-md shadow-lg">
-                      <FiShield className="h-6 w-6 text-white" aria-hidden="true" />
-                    </span>
-                  </div>
-                  <h3 className="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight">Local Processing</h3>
-                  <p className="mt-5 text-base text-gray-500 dark:text-gray-400">
-                    All biometric data is processed locally on your device. Your biometric data never leaves your device.
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="pt-6">
-              <div className="flow-root bg-gray-50 dark:bg-gray-800 rounded-lg px-6 pb-8">
-                <div className="-mt-6">
-                  <div>
-                    <span className="inline-flex items-center justify-center p-3 bg-indigo-500 rounded-md shadow-lg">
-                      <FiGlobe className="h-6 w-6 text-white" aria-hidden="true" />
-                    </span>
-                  </div>
-                  <h3 className="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight">Ethereum Compatible</h3>
-                  <p className="mt-5 text-base text-gray-500 dark:text-gray-400">
-                    Send and receive ETH on the Ethereum network. Compatible with all Ethereum-based tokens and dApps.
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="pt-6">
-              <div className="flow-root bg-gray-50 dark:bg-gray-800 rounded-lg px-6 pb-8">
-                <div className="-mt-6">
-                  <div>
-                    <span className="inline-flex items-center justify-center p-3 bg-indigo-500 rounded-md shadow-lg">
-                      <FiLock className="h-6 w-6 text-white" aria-hidden="true" />
-                    </span>
-                  </div>
-                  <h3 className="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight">Cross-Platform</h3>
-                  <p className="mt-5 text-base text-gray-500 dark:text-gray-400">
-                    Access your wallet from any device. Available on web, iOS, and Android.
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
