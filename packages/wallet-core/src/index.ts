@@ -1,9 +1,8 @@
 import { ethers } from 'ethers';
-import * as argon2 from 'argon2-browser';
 
 /**
  * Generate a wallet from biometric data
- * @param biometricData - The biometric data
+ * @param biometricData - The biometric data (e.g. WebAuthn credential ID)
  * @param salt - A salt to use for key derivation
  * @returns The wallet
  */
@@ -12,18 +11,17 @@ export async function generateWalletFromBiometric(
   salt: string
 ): Promise<ethers.Wallet> {
   try {
-    // Hash the biometric data using Argon2
-    const hashResult = await argon2.hash({
-      pass: biometricData,
-      salt,
-      time: 3, // Number of iterations
-      mem: 4096, // Memory usage in KiB
-      hashLen: 32, // Output hash length
-      parallelism: 1, // Parallelism factor
-    });
+    // Use scrypt for key derivation as it's more compatible with web environments than argon2
+    // and still provides strong security against brute-force attacks.
+    const password = ethers.toUtf8Bytes(biometricData);
+    const saltBytes = ethers.toUtf8Bytes(salt);
 
-    // Use the hash as entropy for wallet generation
-    const wallet = ethers.Wallet.fromPhrase(hashResult.encoded);
+    // scrypt parameters: N=16384, r=8, p=1
+    const derivedKey = await ethers.scrypt(password, saltBytes, 16384, 8, 1, 32);
+
+    // Use the derived key as a private key for wallet generation
+    const privateKey = ethers.hexlify(derivedKey);
+    const wallet = new ethers.Wallet(privateKey);
     
     return wallet;
   } catch (error) {
@@ -91,14 +89,8 @@ export async function getTransactionHistory(
   provider: ethers.Provider
 ): Promise<any[]> {
   try {
-    // This is a simplified example
-    // In a real app, you would use a more sophisticated method
-    // such as querying an Ethereum explorer API
-    
-    // Get the latest block number
     const blockNumber = await provider.getBlockNumber();
     
-    // Get the last 10 blocks
     const blocks = [];
     for (let i = 0; i < 10; i++) {
       if (blockNumber - i < 0) break;
@@ -108,9 +100,9 @@ export async function getTransactionHistory(
       }
     }
     
-    // Get transactions for the address
     const transactions = [];
     for (const block of blocks) {
+      if (!block) continue;
       for (const txHash of block.transactions) {
         const tx = await provider.getTransaction(txHash);
         if (tx && (tx.from === address || tx.to === address)) {
