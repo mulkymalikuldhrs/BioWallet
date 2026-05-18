@@ -44,7 +44,7 @@ The BioWallet system architecture follows these key principles:
 
 1. **Biometric Processing**: All biometric data is processed locally on the device using WebAuthn (web) or native biometric APIs (mobile).
 
-2. **Key Derivation**: The biometric data is used to derive a deterministic key using Argon2 hashing.
+2. **Key Derivation**: The biometric data is used to derive a deterministic key using `ethers.scrypt`.
 
 3. **Wallet Generation**: The derived key is used to generate an Ethereum wallet.
 
@@ -159,15 +159,23 @@ BioWallet takes security seriously:
 
 ## Changelog
 
+### v0.1.2 (2026-05-14)
+- **Final Consolidation & Main Merge**: Finalized the unification of all feature branches into the `main` branch.
+- **Turbo v2 Migration**: Upgraded the monorepo pipeline to Turbo v2.
+- **Dependency Upgrades**: Upgraded `ethers` to v6.16.0+, `next` to v15.1.7, and `react` to v19.0.0.
+- **Security**: Migrated biometric key derivation from Argon2 to `ethers.scrypt` across all platforms.
+- **TypeScript Support**: Added comprehensive `tsconfig.json` across all workspaces.
+
+### v0.1.1 (2025-02-22)
+- **Branch Consolidation**: Merged mobile components and feature branches.
+- **Deterministic Key Fix**: Fixed non-deterministic wallet generation by removing dynamic salt elements.
+- **New Features**: Added `shared-ui` and `utils` packages.
+
 ### v0.1.0 (2025-07-13)
-- Initial project structure setup
-- Implemented backend API with Express and Prisma
-- Created mobile app with React Native and Expo
-- Implemented web app with Next.js and WebAuthn
-- Added biometric authentication for key derivation
-- Implemented Ethereum wallet functionality
-- Added transaction history and user management
-- Created admin dashboard for monitoring and analytics
+- Initial project structure setup.
+- Implemented backend API with Express and Prisma.
+- Created mobile app with React Native and Expo.
+- Implemented web app with Next.js and WebAuthn.
 
 ## TODO: Next Implementation
 
