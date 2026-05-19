@@ -1,5 +1,5 @@
 import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
-import * as argon2 from 'argon2-browser';
+import { ethers } from 'ethers';
 
 /**
  * Check if WebAuthn is supported
@@ -110,17 +110,14 @@ export async function generateKeyFromBiometric(
   salt: string
 ): Promise<string> {
   try {
-    // Hash the biometric data using Argon2
-    const hashResult = await argon2.hash({
-      pass: biometricData,
-      salt,
-      time: 3, // Number of iterations
-      mem: 4096, // Memory usage in KiB
-      hashLen: 32, // Output hash length
-      parallelism: 1, // Parallelism factor
-    });
+    // Use scrypt for key derivation as it's more compatible with web environments than argon2
+    const password = ethers.toUtf8Bytes(biometricData);
+    const saltBytes = ethers.toUtf8Bytes(salt);
 
-    return hashResult.encoded;
+    // scrypt parameters: N=16384, r=8, p=1
+    const derivedKey = await ethers.scrypt(password, saltBytes, 16384, 8, 1, 32);
+
+    return ethers.hexlify(derivedKey);
   } catch (error) {
     console.error('Error generating key from biometric:', error);
     throw new Error('Failed to generate key from biometric');
