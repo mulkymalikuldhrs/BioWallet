@@ -1,56 +1,35 @@
-# BioWallet
+<div align="center">
 
-```
- ____  _      _    _       _ _      _   
-| __ )(_) ___| |  | | __ _| | | ___| |_ 
-|  _ \| |/ _ \ |  | |/ _` | | |/ _ \ __|
-| |_) | | (_) | |__| | (_| | | |  __/ |_ 
-|____/|_|\___/|_____|\__,_|_|_|\___|\__|
-                                        
-Your body is your password
-```
+<a href="https://github.com/mulkymalikuldhrs/BioWallet">
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=28&duration=3000&pause=1000&color=2E9EF7&center=true&vCenter=true&multiline=false&repeat=true&width=500&height=50&lines=BioWallet;Your+Body+is+Your+Password;Biometric+Crypto+Wallet" alt="Typing SVG" />
+</a>
 
-BioWallet is a revolutionary crypto wallet that uses human biometrics (fingerprint, face, iris) for key derivation instead of passwords or seed phrases. It provides a secure, user-friendly way to manage your cryptocurrency assets.
+<br/>
 
-## Features
+[![Version](https://img.shields.io/badge/version-1.0.0-2E9EF7?style=for-the-badge&logo=semver)](https://github.com/mulkymalikuldhrs/BioWallet)
+[![React Native](https://img.shields.io/badge/React_Native-Expo-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactnative.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/mulkymalikuldhrs/BioWallet?style=for-the-badge&logo=github&color=yellow)](https://github.com/mulkymalikuldhrs/BioWallet/stargazers)
+[![GitHub](https://img.shields.io/badge/GitHub-mulkymalikuldhrs-181717?style=for-the-badge&logo=github)](https://github.com/mulkymalikuldhrs/BioWallet)
 
-- **Biometric Authentication**: Use your fingerprint, face, or iris to secure your wallet
-- **No Seed Phrases**: Never worry about losing or forgetting your seed phrase
-- **Cross-Platform**: Available on Android, iOS, and Web
-- **Local Biometric Processing**: All biometric data is processed locally on your device
-- **Ethereum Compatible**: Send and receive ETH and ERC-20 tokens
-- **Beautiful UI/UX**: Intuitive and user-friendly interface
-- **Secure Key Derivation**: Deterministic key generation from biometric data
-- **Referral System**: Built-in referral system to grow the user base
-- **Transaction History**: View all your transactions in one place
-- **Admin Dashboard**: Comprehensive admin dashboard for monitoring and analytics
+<br/>
 
-## Architecture
+**A revolutionary biometric crypto wallet that uses human biometrics (fingerprint, face, iris) for key derivation instead of passwords or seed phrases.**
 
-BioWallet is built as a monorepo with the following components:
+[🐛 Report Bug](https://github.com/mulkymalikuldhrs/BioWallet/issues) &bull; [✨ Request Feature](https://github.com/mulkymalikuldhrs/BioWallet/issues)
 
-- **Mobile App**: React Native + Expo
-- **Web App**: Next.js + WebAuthn
-- **Backend API**: Express + Prisma + PostgreSQL
-- **Shared Packages**:
-  - `wallet-core`: Ethereum wallet functionality
-  - `biometric-core`: Biometric processing
-  - `shared-ui`: Shared UI components
-  - `utils`: Utility functions
+</div>
 
-## Blueprint
+---
 
-The BioWallet system architecture follows these key principles:
+## 🇬🇧 English
 
-1. **Biometric Processing**: All biometric data is processed locally on the device using WebAuthn (web) or native biometric APIs (mobile).
+### ✨ Overview
 
-2. **Key Derivation**: The biometric data is used to derive a deterministic key using Argon2 hashing.
+BioWallet is a revolutionary crypto wallet that uses human biometrics — fingerprint, face, and iris — for deterministic key derivation, eliminating the need for passwords or seed phrases. Built as a monorepo with React Native (mobile), Next.js (web), and Express (backend), it provides a secure, user-friendly way to manage your cryptocurrency assets with biometric authentication at its core.
 
-3. **Wallet Generation**: The derived key is used to generate an Ethereum wallet.
-
-4. **Transaction Signing**: Transactions are signed locally using the derived key after biometric authentication.
-
-5. **Backend Services**: The backend provides API endpoints for user management, transaction history, and analytics.
+### 🏗️ Architecture
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
@@ -60,297 +39,173 @@ The BioWallet system architecture follows these key principles:
 │                 │     │                 │     │                 │
 └────────┬────────┘     └────────┬────────┘     └────────┬────────┘
          │                       │                       │
-         │                       │                       │
-         │                       │                       │
-         │                       ▼                       │
-         │              ┌─────────────────┐              │
-         └──────────────►                 ◄──────────────┘
-                        │   Backend API   │
-                        │    (Express)    │
-                        │                 │
-                        └────────┬────────┘
-                                 │
-                                 │
-                                 ▼
-                        ┌─────────────────┐
-                        │                 │
-                        │   PostgreSQL    │
-                        │   Database      │
-                        │                 │
-                        └─────────────────┘
+         └──────────────►       │       ◄───────────────┘
+                         ┌──────┴──────┐
+                         │ Backend API │
+                         │  (Express)  │
+                         └──────┬──────┘
+                                │
+                         ┌──────┴──────┐
+                         │ PostgreSQL  │
+                         │  Database   │
+                         └─────────────┘
 ```
 
-## Getting Started
+### 🎯 Features
 
-### Prerequisites
+| Feature | Description |
+|---------|-------------|
+| 🔐 **Biometric Authentication** | Use fingerprint, face, or iris to secure your wallet |
+| 🔑 **No Seed Phrases** | Deterministic key derivation from biometric data |
+| 📱 **Cross-Platform** | Available on Android, iOS, and Web |
+| 🛡️ **Local Processing** | All biometric data processed locally on device |
+| ⛓️ **Ethereum Compatible** | Send and receive ETH and ERC-20 tokens |
+| 💎 **Beautiful UI/UX** | Intuitive and user-friendly interface |
+| 📊 **Transaction History** | View all your transactions in one place |
+| 👨‍💼 **Admin Dashboard** | Comprehensive admin dashboard for monitoring |
+| 🤝 **Referral System** | Built-in referral system to grow the user base |
 
-- Node.js 14+
-- Yarn or npm
-- Docker and Docker Compose (for development)
+### 🚀 Quick Start
 
-### Installation
+```bash
+# Clone the repository
+git clone https://github.com/mulkymalikuldhrs/BioWallet.git
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/mulkymalikuldhrs/BioWallet.git
-   cd BioWallet
-   ```
+# Install dependencies
+cd BioWallet && yarn install
 
-2. Install dependencies:
-   ```
-   yarn install
-   ```
+# Start Docker services
+yarn docker:up
+yarn prisma:generate
+yarn prisma:migrate
 
-3. Start the development environment:
-   ```
-   yarn docker:up
-   yarn prisma:generate
-   yarn prisma:migrate
-   ```
+# Start backend
+yarn dev:backend
 
-4. Start the applications:
-   ```
-   # Backend API
-   yarn dev:backend
-   
-   # Web App
-   yarn dev:web
-   
-   # Mobile App
-   yarn dev:mobile
-   ```
+# Start web app
+yarn dev:web
 
-## Development
-
-### Mobile App
-
-The mobile app is built with React Native and Expo. To start the development server:
-
-```
+# Start mobile app
 yarn dev:mobile
 ```
 
-### Web App
+---
 
-The web app is built with Next.js. To start the development server:
+## 🇮🇩 Bahasa Indonesia
 
-```
-yarn dev:web
-```
+### ✨ Gambaran Umum
 
-### Backend API
+BioWallet adalah dompet kripto revolusioner yang menggunakan biometrik manusia — sidik jari, wajah, dan iris — untuk derivasi kunci deterministik, menghilangkan kebutuhan akan kata sandi atau frasa seed. Dibangun sebagai monorepo dengan React Native (mobile), Next.js (web), dan Express (backend), menyediakan cara yang aman dan mudah digunakan untuk mengelola aset kripto Anda dengan autentikasi biometrik sebagai intinya.
 
-The backend API is built with Express and Prisma. To start the development server:
+### 🎯 Fitur Utama
 
-```
+| Fitur | Deskripsi |
+|-------|-----------|
+| 🔐 **Autentikasi Biometrik** | Gunakan sidik jari, wajah, atau iris untuk mengamankan dompet |
+| 🔑 **Tanpa Frasa Seed** | Derivasi kunci deterministik dari data biometrik |
+| 📱 **Lintas Platform** | Tersedia di Android, iOS, dan Web |
+| 🛡️ **Pemrosesan Lokal** | Semua data biometrik diproses secara lokal di perangkat |
+| ⛓️ **Kompatibel Ethereum** | Kirim dan terima ETH serta token ERC-20 |
+| 💎 **UI/UX Indah** | Antarmuka yang intuitif dan mudah digunakan |
+| 📊 **Riwayat Transaksi** | Lihat semua transaksi Anda di satu tempat |
+| 👨‍💼 **Dashboard Admin** | Dashboard admin yang komprehensif untuk pemantauan |
+
+### 🚀 Mulai Cepat
+
+```bash
+git clone https://github.com/mulkymalikuldhrs/BioWallet.git
+cd BioWallet && yarn install
+yarn docker:up && yarn prisma:generate && yarn prisma:migrate
 yarn dev:backend
 ```
 
-## Security
+---
 
-BioWallet takes security seriously:
+## 🇨🇳 中文
 
-1. **Local Processing**: All biometric data is processed locally on your device
-2. **No Storage**: Biometric data is never stored or transmitted
-3. **Deterministic Key Derivation**: Biometric data is used to derive a deterministic key
-4. **Encryption**: All sensitive data is encrypted
-5. **WebAuthn**: Uses the Web Authentication API for secure biometric authentication
-6. **No Seed Phrases**: Eliminates the risk of lost or stolen seed phrases
+### ✨ 概述
 
-## Changelog
+BioWallet 是一款革命性的加密钱包，使用人体生物特征——指纹、面部和虹膜——进行确定性密钥派生，无需密码或助记词。采用 monorepo 架构，包含 React Native（移动端）、Next.js（网页端）和 Express（后端），以生物特征认证为核心，提供安全、友好的加密资产管理方式。
 
-### v0.1.0 (2025-07-13)
-- Initial project structure setup
-- Implemented backend API with Express and Prisma
-- Created mobile app with React Native and Expo
-- Implemented web app with Next.js and WebAuthn
-- Added biometric authentication for key derivation
-- Implemented Ethereum wallet functionality
-- Added transaction history and user management
-- Created admin dashboard for monitoring and analytics
+### 🎯 主要功能
 
-## TODO: Next Implementation
+| 功能 | 描述 |
+|------|------|
+| 🔐 **生物特征认证** | 使用指纹、面部或虹膜保护您的钱包 |
+| 🔑 **无需助记词** | 从生物特征数据进行确定性密钥派生 |
+| 📱 **跨平台** | 支持 Android、iOS 和 Web |
+| 🛡️ **本地处理** | 所有生物特征数据在设备本地处理 |
+| ⛓️ **以太坊兼容** | 发送和接收 ETH 及 ERC-20 代币 |
+| 💎 **精美 UI/UX** | 直观且用户友好的界面 |
+| 📊 **交易历史** | 在一处查看所有交易 |
+| 👨‍💼 **管理仪表板** | 全面的管理仪表板用于监控 |
 
-### Biometric Enhancements
-1. **Advanced Biometric Integration**:
-   - Implement iris scanning for enhanced security
-   - Add voice recognition as an alternative biometric method
-   - Develop behavioral biometrics (typing patterns, gesture analysis)
-   - Create multi-modal biometric fusion for stronger authentication
+### 🚀 快速开始
 
-2. **Biometric Processing Optimization**:
-   - Implement edge computing for faster biometric processing
-   - Develop lightweight biometric algorithms for mobile devices
-   - Create adaptive biometric thresholds based on risk assessment
-   - Implement continuous authentication through passive biometrics
+```bash
+git clone https://github.com/mulkymalikuldhrs/BioWallet.git
+cd BioWallet && yarn install
+yarn docker:up && yarn prisma:generate && yarn prisma:migrate
+yarn dev:backend
+```
 
-3. **Biometric Privacy**:
-   - Implement zero-knowledge biometric proofs
-   - Develop local biometric template protection
-   - Create biometric data anonymization techniques
-   - Implement privacy-preserving biometric matching
+---
 
-### Security Enhancements
-4. **Multi-Factor Authentication**:
-   - Add FIDO2/WebAuthn support for hardware security keys
-   - Implement time-based one-time passwords (TOTP)
-   - Develop context-aware authentication factors
-   - Create risk-based authentication workflows
+## 🛠️ Tech Stack
 
-5. **Advanced Security Features**:
-   - Implement transaction limits and approvals
-   - Add device management for multi-device support
-   - Create geo-fencing and time-based restrictions
-   - Develop anomaly detection for suspicious activities
+| Technology | Purpose |
+|-----------|---------|
+| ![React Native](https://img.shields.io/badge/React_Native-Expo-61DAFB?logo=react&logoColor=black) | Mobile App |
+| ![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=next.js) | Web App |
+| ![Express](https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white) | Backend API |
+| ![Prisma](https://img.shields.io/badge/Prisma-5-2D3748?logo=prisma) | ORM |
+| ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&logoColor=white) | Database |
+| ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white) | Type Safety |
+| ![WebAuthn](https://img.shields.io/badge/WebAuthn-FIDO2-FF6F00) | Biometric Auth |
 
-6. **Quantum Resistance**:
-   - Implement post-quantum cryptographic algorithms
-   - Develop quantum-resistant key derivation functions
-   - Create hybrid classical/quantum-resistant signatures
-   - Implement quantum-resistant secure elements integration
+## 🤝 Contributing
 
-### Recovery & Backup
-7. **Social Recovery System**:
-   - Implement Shamir's Secret Sharing for distributed recovery
-   - Create guardian management interface
-   - Develop time-locked recovery mechanisms
-   - Implement recovery through trusted institutions
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
 
-8. **Enhanced Backup Solutions**:
-   - Create encrypted cloud backup options
-   - Implement secure offline backup methods
-   - Develop partial recovery from incomplete backups
-   - Create recovery rehearsal and testing tools
+## 📄 License
 
-### Multi-Chain Support
-9. **Blockchain Expansion**:
-   - Add support for Solana, Polygon, Avalanche, and other L1/L2 chains
-   - Implement cross-chain transaction capabilities
-   - Create unified address management across chains
-   - Develop chain-specific security features
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
-10. **Cross-Chain Interoperability**:
-    - Implement atomic swaps between chains
-    - Create cross-chain messaging capabilities
-    - Develop unified transaction history across chains
-    - Implement cross-chain asset bridging
+## 👤 Author
 
-### DeFi & Financial Features
-11. **DeFi Integration**:
-    - Connect to popular DeFi protocols (Uniswap, Aave, Compound)
-    - Add staking and yield farming features
-    - Implement token swaps and liquidity provision
-    - Create DeFi portfolio management tools
+**Mulky Malikul Dhaher**
 
-12. **Financial Tools**:
-    - Implement spending analytics and budgeting features
-    - Create recurring payments and subscriptions
-    - Develop tax reporting and tracking tools
-    - Implement fiat on/off ramps
+[![GitHub](https://img.shields.io/badge/GitHub-mulkymalikuldhrs-181717?style=flat&logo=github)](https://github.com/mulkymalikuldhrs)
+[![Email](https://img.shields.io/badge/Email-mulkymalikuldhaher@email.com-EA4335?style=flat&logo=gmail&logoColor=white)](mailto:mulkymalikuldhaher@email.com)
 
-13. **AI-Powered Financial Advice**:
-    - Create personalized investment recommendations
-    - Implement risk assessment tools
-    - Develop market trend analysis
-    - Create AI-powered fraud detection
+---
 
-### NFT & Digital Assets
-14. **NFT Support**:
-    - Add NFT viewing and management
-    - Implement NFT marketplace integration
-    - Create NFT creation tools
-    - Develop NFT authentication using biometrics
+## ⚠️ Disclaimer
 
-15. **Digital Collectibles**:
-    - Implement digital collectibles gallery
-    - Create social sharing of collections
-    - Develop rarity and valuation tools
-    - Implement cross-platform collectibles import/export
+### 🇬🇧 English
 
-### User Experience
-16. **UI/UX Enhancements**:
-    - Create customizable interfaces and themes
-    - Implement accessibility features for users with disabilities
-    - Develop localization for multiple languages
-    - Create guided tutorials and onboarding flows
+> **⚠️ For Education Purpose Only**
+> This project is provided strictly for educational and research purposes. The authors and contributors assume **no responsibility or liability** for any damages, losses, or risks arising from the use of this software. **We do not bear any responsibility or risk** for how this software is used.
+> **Contact:** Mulky Malikul Dhaher | mulkymalikuldhaher@email.com
 
-17. **Psychological Design Elements**:
-    - Implement gamification features for engagement
-    - Create visual security indicators
-    - Develop trust-building interface elements
-    - Implement behavioral nudges for security best practices
+### 🇮🇩 Bahasa Indonesia
 
-18. **Performance Optimization**:
-    - Optimize app startup time and responsiveness
-    - Implement efficient data synchronization
-    - Create offline functionality
-    - Develop battery optimization techniques
+> **⚠️ Hanya untuk Tujuan Pendidikan**
+> Proyek ini disediakan secara ketat untuk tujuan pendidikan dan penelitian. Penulis dan kontributor **tidak bertanggung jawab atau berkewajiban** atas kerusakan, kerugian, atau risiko yang timbul dari penggunaan perangkat lunak ini. **Kami tidak menanggung tanggung jawab atau risiko** apa pun untuk penggunaan perangkat lunak ini.
+> **Kontak:** Mulky Malikul Dhaher | mulkymalikuldhaher@email.com
 
-### Privacy Features
-19. **Enhanced Privacy**:
-    - Implement zero-knowledge proofs for private transactions
-    - Create stealth addresses for enhanced privacy
-    - Develop coin mixing/tumbling capabilities
-    - Implement encrypted messaging
+### 🇨🇳 中文
 
-20. **Regulatory Compliance**:
-    - Create selective disclosure mechanisms
-    - Implement travel rule compliance
-    - Develop KYC/AML integration options
-    - Create compliance reporting tools
+> **⚠️ 仅供教育目的**
+> 本项目严格仅供教育和研究目的提供。作者和贡献者对因使用本软件而产生的任何损害、损失或风险**不承担任何责任或义务**。**我们不承担任何责任或风险**对于本软件的使用方式。
+> **联系方式:** Mulky Malikul Dhaher | mulkymalikuldhaher@email.com
 
-### Developer Tools
-21. **SDK & API Development**:
-    - Create developer SDKs for multiple platforms
-    - Implement comprehensive API documentation
-    - Develop plugin architecture for extensions
-    - Create developer sandbox environments
+---
 
-22. **Integration Capabilities**:
-    - Implement OAuth and SSO capabilities
-    - Create merchant integration tools
-    - Develop smart contract interaction templates
-    - Implement web3 dApp connectors
+<div align="center">
 
-### Enterprise Features
-23. **Business Solutions**:
-    - Create multi-user account management
-    - Implement role-based access controls
-    - Develop corporate treasury management
-    - Create payroll and expense management tools
+Made with ❤️ by Mulky Malikul Dhaher
 
-24. **Institutional Grade Security**:
-    - Implement HSM integration
-    - Create MPC-based key management
-    - Develop audit logging and compliance reporting
-    - Implement air-gapped signing capabilities
+**For Education Purpose Only**
 
-### Testing & Quality Assurance
-25. **Expanded Testing**:
-    - Add comprehensive unit and integration tests
-    - Implement end-to-end testing
-    - Conduct security audits and penetration testing
-    - Create automated regression testing
-
-26. **Quality Assurance**:
-    - Implement continuous integration/continuous deployment
-    - Create performance benchmarking tools
-    - Develop stress testing frameworks
-    - Implement bug bounty program
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Credits
-
-Developed by **Mulky Malikul Dhaher** (mulkymalikuldhr@technologist.com)
-
-## Acknowledgments
-
-- [Ethereum](https://ethereum.org/)
-- [WebAuthn](https://webauthn.io/)
-- [React Native](https://reactnative.dev/)
-- [Next.js](https://nextjs.org/)
-- [Expo](https://expo.dev/)
-- [Prisma](https://www.prisma.io/)
+</div>
