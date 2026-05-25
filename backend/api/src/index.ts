@@ -8,6 +8,7 @@ import userRoutes from './routes/userRoutes';
 import walletRoutes from './routes/walletRoutes';
 import transactionRoutes from './routes/transactionRoutes';
 import adminRoutes from './routes/adminRoutes';
+import { defaultRateLimiter, strictRateLimiter } from './middleware/rateLimiter';
 
 dotenv.config();
 
@@ -16,20 +17,30 @@ const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-API-Key'],
+}));
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
 
-// Health check
+// Apply default rate limiting to all routes
+app.use(defaultRateLimiter);
+
+// Health check (no auth required)
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+  res.status(200).json({ status: 'ok', version: '2.0.0', network: 'sepolia' });
 });
 
 // Routes
+// Public routes (with strict rate limiting for creation endpoints)
 app.use('/api/users', userRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/transactions', transactionRoutes);
+
+// Admin routes (protected by admin auth middleware in routes)
 app.use('/api/admin', adminRoutes);
 
 // Error handling
@@ -44,6 +55,8 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Network: Sepolia testnet`);
+  console.log(`RPC: ${process.env.ETHEREUM_RPC_URL || 'https://rpc.ankr.com/eth_sepolia'}`);
 });
 
 // Handle graceful shutdown

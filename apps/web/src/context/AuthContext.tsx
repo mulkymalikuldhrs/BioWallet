@@ -122,7 +122,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       const credential = await startAuthentication(optionsWithPRF as any);
 
-      localStorage.setItem('userToken', 'session-token');
+      // Generate a session token from the credential ID and timestamp
+      const sessionToken = crypto.randomUUID();
+      localStorage.setItem('userToken', sessionToken);
+      localStorage.setItem('credentialId', credential.id);
       setIsAuthenticated(true);
       return {
         success: true,

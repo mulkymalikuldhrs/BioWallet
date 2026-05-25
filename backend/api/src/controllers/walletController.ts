@@ -3,8 +3,8 @@ import { ethers } from 'ethers';
 import { prisma } from '../index';
 import { BiometricType } from '@prisma/client';
 
-// Provider for Ethereum testnet (Goerli)
-const provider = new ethers.JsonRpcProvider(process.env.ETHEREUM_RPC_URL || 'https://goerli.infura.io/v3/your-infura-key');
+// Provider for Ethereum testnet (Sepolia)
+const provider = new ethers.JsonRpcProvider(process.env.ETHEREUM_RPC_URL || 'https://rpc.ankr.com/eth_sepolia');
 
 // Register a new wallet
 export const registerWallet = async (req: Request, res: Response) => {
@@ -87,7 +87,7 @@ export const getWalletBalance = async (req: Request, res: Response) => {
       address,
       balance: balanceInEth,
       token: 'ETH',
-      network: process.env.ETHEREUM_NETWORK || 'goerli'
+      network: process.env.ETHEREUM_NETWORK || 'sepolia'
     });
   } catch (error) {
     console.error('Error fetching wallet balance:', error);

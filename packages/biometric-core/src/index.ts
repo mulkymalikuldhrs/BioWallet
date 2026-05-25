@@ -41,8 +41,12 @@ export async function registerWebAuthnCredential(
   try {
     // In a real app, you would fetch registration options from the server
     // This is a simplified example
+    const challenge = new Uint8Array(32);
+    if (typeof window !== 'undefined' && window.crypto) {
+      window.crypto.getRandomValues(challenge);
+    }
     const registrationOptions = {
-      challenge: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]),
+      challenge,
       rp: {
         name: rpName,
         id: rpId,
@@ -83,8 +87,12 @@ export async function authenticateWithWebAuthn(rpId: string): Promise<any> {
   try {
     // In a real app, you would fetch authentication options from the server
     // This is a simplified example
+    const challenge = new Uint8Array(32);
+    if (typeof window !== 'undefined' && window.crypto) {
+      window.crypto.getRandomValues(challenge);
+    }
     const authenticationOptions = {
-      challenge: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]),
+      challenge,
       timeout: 60000,
       userVerification: 'required',
       rpId,

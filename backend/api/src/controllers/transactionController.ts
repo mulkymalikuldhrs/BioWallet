@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import { ethers } from 'ethers';
 import { prisma } from '../index';
 
-// Provider for Ethereum testnet (Goerli)
-const provider = new ethers.JsonRpcProvider(process.env.ETHEREUM_RPC_URL || 'https://goerli.infura.io/v3/your-infura-key');
+// Provider for Ethereum testnet (Sepolia)
+const provider = new ethers.JsonRpcProvider(process.env.ETHEREUM_RPC_URL || 'https://rpc.ankr.com/eth_sepolia');
 
 // Create a new transaction
 export const createTransaction = async (req: Request, res: Response) => {
@@ -37,7 +37,7 @@ export const createTransaction = async (req: Request, res: Response) => {
         toAddress,
         userId,
         status: 'PENDING',
-        network: process.env.ETHEREUM_NETWORK || 'goerli'
+        network: process.env.ETHEREUM_NETWORK || 'sepolia'
       }
     });
 

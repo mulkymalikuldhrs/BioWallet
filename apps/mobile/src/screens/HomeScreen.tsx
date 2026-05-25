@@ -83,7 +83,7 @@ const HomeScreen: React.FC = () => {
         <View style={[styles.networkBadge, { backgroundColor: colors.accent + '20' }]}>
           <View style={[styles.networkDot, { backgroundColor: colors.accent }]} />
           <Text style={[styles.networkText, { color: colors.accent }]}>
-            Goerli Testnet
+            Sepolia Testnet
           </Text>
         </View>
       </Animated.View>
