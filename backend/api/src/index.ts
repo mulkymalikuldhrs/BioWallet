@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import walletRoutes from './routes/walletRoutes';
 import transactionRoutes from './routes/transactionRoutes';
@@ -21,13 +22,13 @@ const PORT = process.env.PORT || 3001;
 app.set('trust proxy', 1);
 
 // ─── CORS Configuration ───────────────────────────────────────────────
-// Defaults to http://localhost:3000 for development if CORS_ORIGIN is not set.
+// Defaults to http://localhost:12000 for development if CORS_ORIGIN is not set.
 // In production, CORS_ORIGIN must be set to a comma-separated list of allowed origins.
 const corsOrigin = (() => {
   const configured = process.env.CORS_ORIGIN;
   if (!configured) {
-    console.warn('CORS_ORIGIN not set, defaulting to http://localhost:3000 (development only)');
-    return 'http://localhost:3000';
+    console.warn('CORS_ORIGIN not set, defaulting to http://localhost:12000 (development only)');
+    return 'http://localhost:12000';
   }
   // Support comma-separated list of origins
   const origins = configured.split(',').map((o) => o.trim()).filter(Boolean);
@@ -89,6 +90,9 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
+// Auth routes (login endpoint)
+app.use('/api/auth', authRoutes);
+
 // Public routes (with strict rate limiting for creation endpoints applied in route files)
 app.use('/api/users', userRoutes);
 app.use('/api/wallet', walletRoutes);

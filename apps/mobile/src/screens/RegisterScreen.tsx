@@ -22,14 +22,15 @@ const RegisterScreen: React.FC = () => {
   
   useEffect(() => {
     // Start fade animation
-    Animated.timing(fadeAnim, {
+    const fadeAnimRef = Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 800,
       useNativeDriver: true,
-    }).start();
+    });
+    fadeAnimRef.start();
     
     // Start pulse animation
-    Animated.loop(
+    const pulseLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
           toValue: 1.1,
@@ -42,7 +43,8 @@ const RegisterScreen: React.FC = () => {
           useNativeDriver: true,
         }),
       ])
-    ).start();
+    );
+    pulseLoop.start();
     
     // Check available biometric types
     const checkBiometrics = async () => {
@@ -83,6 +85,12 @@ const RegisterScreen: React.FC = () => {
     };
     
     checkBiometrics();
+
+    // Cleanup animations on unmount to prevent memory leaks
+    return () => {
+      fadeAnimRef.stop();
+      pulseLoop.stop();
+    };
   }, []);
   
   const handleRegister = async () => {

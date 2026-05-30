@@ -64,6 +64,14 @@ export const createTransactionSchema = z.object({
 });
 
 /**
+ * Login schema (for POST /api/auth/login)
+ */
+export const loginSchema = z.object({
+  walletAddress: ethAddressSchema,
+  deviceId: z.string().min(1, 'Device ID must not be empty').optional(),
+});
+
+/**
  * Admin daily stats query schema
  */
 export const dailyStatsQuerySchema = z.object({

@@ -1,7 +1,23 @@
 import { Request, Response } from 'express';
+import crypto from 'crypto';
 import { prisma } from '../index';
 import { BiometricType, Prisma } from '@prisma/client';
 import { generateToken } from '../middleware/auth';
+
+/**
+ * Increment AdminStats.totalUsers for today's date.
+ * Uses upsert so the row is created if it doesn't exist yet.
+ */
+async function incrementTotalUsers(): Promise<void> {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  await prisma.adminStats.upsert({
+    where: { date: today },
+    update: { totalUsers: { increment: 1 } },
+    create: { date: today, totalUsers: 1 },
+  });
+}
 
 // Create a new user
 export const createUser = async (req: Request, res: Response) => {
@@ -22,8 +38,8 @@ export const createUser = async (req: Request, res: Response) => {
       return res.status(409).json({ message: 'Wallet address already registered' });
     }
 
-    // Generate referral code
-    const referralCode = `BIO${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    // Generate referral code using crypto-safe random
+    const referralCode = `BIO${crypto.randomUUID().replace(/-/g, '').substring(0, 8).toUpperCase()}`;
 
     // Resolve referrer by referral code (referredBy is a code, not an ID)
     let referredById: string | undefined;
@@ -52,6 +68,9 @@ export const createUser = async (req: Request, res: Response) => {
     // Generate JWT token for the newly created user
     const token = generateToken(user.id, user.walletAddress);
 
+    // Increment AdminStats.totalUsers
+    await incrementTotalUsers();
+
     res.status(201).json({
       id: user.id,
       walletAddress: user.walletAddress,
@@ -65,13 +84,52 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
+// Get current authenticated user ("me")
+export const getMe = async (req: Request, res: Response) => {
+  try {
+    const authenticatedUser = req.user;
+    if (!authenticatedUser) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: authenticatedUser.id },
+      select: {
+        id: true,
+        walletAddress: true,
+        email: true,
+        biometricType: true,
+        createdAt: true,
+        referralCode: true,
+        isPremium: true,
+        lastLogin: true
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error fetching current user:', error);
+    res.status(500).json({ message: 'Failed to fetch user' });
+  }
+};
+
 // Get user by ID or Wallet Address
 export const getUserById = async (req: Request, res: Response) => {
   try {
     const { id: identifier } = req.params;
+    const authenticatedUser = req.user;
 
     if (typeof identifier !== 'string') {
       return res.status(400).json({ message: 'Invalid identifier' });
+    }
+
+    // IDOR protection: non-admin users can only view their own profile
+    if (!authenticatedUser?.isAdmin && authenticatedUser?.id !== identifier && authenticatedUser?.walletAddress !== identifier) {
+      return res.status(403).json({ message: 'Access denied: you can only view your own profile' });
     }
 
     const user = await prisma.user.findFirst({
@@ -109,13 +167,23 @@ export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { email, deviceId, isPremium } = req.body;
+    const authenticatedUser = req.user;
 
     if (typeof id !== 'string') {
       return res.status(400).json({ message: 'Invalid ID' });
     }
 
+    // IDOR protection: non-admin users can only update their own profile
+    if (!authenticatedUser?.isAdmin && authenticatedUser?.id !== id) {
+      return res.status(403).json({ message: 'Access denied: you can only update your own profile' });
+    }
+
     const updateData: any = { email, deviceId, lastLogin: new Date() };
     if (isPremium !== undefined) {
+      // Only admins can change isPremium status
+      if (!authenticatedUser?.isAdmin) {
+        return res.status(403).json({ message: 'Access denied: only admins can change premium status' });
+      }
       updateData.isPremium = isPremium;
     }
 

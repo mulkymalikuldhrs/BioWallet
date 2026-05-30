@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import crypto from 'crypto';
 import { ethers } from 'ethers';
 import { prisma } from '../index';
 import { BiometricType, Prisma } from '@prisma/client';
@@ -26,8 +27,8 @@ export const registerWallet = async (req: Request, res: Response) => {
       return res.status(409).json({ message: 'Wallet address already registered' });
     }
 
-    // Generate referral code
-    const referralCode = `BIO${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    // Generate referral code using crypto-safe random
+    const referralCode = `BIO${crypto.randomUUID().replace(/-/g, '').substring(0, 8).toUpperCase()}`;
 
     // Resolve referrer by referral code
     let referrerId: string | undefined;
@@ -55,6 +56,15 @@ export const registerWallet = async (req: Request, res: Response) => {
 
     // Generate JWT token for the newly registered user
     const token = generateToken(user.id, user.walletAddress);
+
+    // Increment AdminStats.totalUsers
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    await prisma.adminStats.upsert({
+      where: { date: today },
+      update: { totalUsers: { increment: 1 } },
+      create: { date: today, totalUsers: 1 },
+    });
 
     // If user was referred, create referral reward for the referrer
     if (referrerId) {
@@ -109,10 +119,16 @@ export const getWalletBalance = async (req: Request, res: Response) => {
 export const getWalletTransactions = async (req: Request, res: Response) => {
   try {
     const { address } = req.params;
+    const authenticatedUser = req.user;
 
     // Validate address format
     if (!ethers.isAddress(address)) {
       return res.status(400).json({ message: 'Invalid Ethereum address' });
+    }
+
+    // IDOR protection: non-admin users can only view their own wallet transactions
+    if (!authenticatedUser?.isAdmin && authenticatedUser?.walletAddress?.toLowerCase() !== address.toLowerCase()) {
+      return res.status(403).json({ message: 'Access denied: you can only view your own wallet transactions' });
     }
 
     // Find user by wallet address

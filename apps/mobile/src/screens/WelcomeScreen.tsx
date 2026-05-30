@@ -15,18 +15,23 @@ const WelcomeScreen: React.FC = () => {
   
   useEffect(() => {
     // Start animations when component mounts
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    const fadeAnimRef = Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    });
+    const slideAnimRef = Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 800,
+      useNativeDriver: true,
+    });
+    Animated.parallel([fadeAnimRef, slideAnimRef]).start();
+
+    // Cleanup animations on unmount
+    return () => {
+      fadeAnimRef.stop();
+      slideAnimRef.stop();
+    };
   }, []);
   
   return (

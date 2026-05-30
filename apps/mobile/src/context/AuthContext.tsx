@@ -56,6 +56,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // Register with biometric authentication
+  // This only performs local biometric enrollment. The actual backend
+  // registration happens in WalletContext after the wallet address is generated.
   const register = async (): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
@@ -91,79 +93,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Biometric authentication failed');
       }
 
-      // Store authentication state
+      // Store authentication state locally
       await SecureStore.setItemAsync('isRegistered', 'true');
       await SecureStore.setItemAsync('biometricType', biometricType);
 
-      // Get device ID for backend registration
+      // Get device ID
       const deviceId = await SecureStore.getItemAsync('deviceId');
       if (!deviceId) {
         throw new Error('Device ID not found. Please restart the app.');
       }
 
-      // The wallet address will be set by WalletContext after wallet generation.
-      // For now, we register the user on the backend with the deviceId and biometricType.
-      // The wallet address will be linked when the wallet is generated.
-      // We use a placeholder publicKey that will be updated later.
-      const placeholderPublicKey = `biowallet-mobile-${deviceId.slice(0, 8)}`;
-
-      try {
-        const response = await fetch(`${API_BASE_URL}/users`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            walletAddress: `pending-${deviceId.slice(0, 8)}`, // Temporary, will be updated
-            publicKey: placeholderPublicKey,
-            biometricType,
-            deviceId,
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          // Store the JWT token from backend
-          if (data.token) {
-            await SecureStore.setItemAsync('userToken', data.token);
-          }
-          if (data.id) {
-            await SecureStore.setItemAsync('userId', data.id);
-          }
-        } else {
-          const data = await response.json().catch(() => ({}));
-          // 409 means user already exists — try to login instead
-          if (response.status === 409) {
-            try {
-              const loginResponse = await fetch(`${API_BASE_URL}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  walletAddress: `pending-${deviceId.slice(0, 8)}`,
-                  deviceId,
-                }),
-              });
-              if (loginResponse.ok) {
-                const loginData = await loginResponse.json();
-                if (loginData.token) {
-                  await SecureStore.setItemAsync('userToken', loginData.token);
-                }
-                if (loginData.id) {
-                  await SecureStore.setItemAsync('userId', loginData.id);
-                }
-              }
-            } catch (loginErr) {
-              console.warn('Backend login fallback failed:', loginErr);
-            }
-          } else {
-            console.warn('Backend registration warning:', data.message || 'Unknown error');
-          }
-        }
-      } catch (backendErr) {
-        // Non-blocking: auth works offline, backend sync can retry later
-        console.warn('Could not register with backend:', backendErr);
-        // Store a local token as fallback
-        const fallbackToken = uuidv4();
-        await SecureStore.setItemAsync('userToken', fallbackToken);
-      }
+      // NOTE: Backend registration is deferred to WalletContext, which first
+      // generates the wallet and obtains a valid Ethereum address before
+      // calling POST /api/wallet/register. This ensures the walletAddress
+      // passes Zod validation (0x-prefixed, 40 hex chars).
 
       setIsAuthenticated(true);
       return true;
@@ -226,21 +169,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           } else {
             const data = await response.json().catch(() => ({}));
             console.warn('Backend login warning:', data.message || 'Unknown error');
-            // Fall back to existing token or generate a new one
-            const existingToken = await SecureStore.getItemAsync('userToken');
-            if (!existingToken) {
-              const fallbackToken = uuidv4();
-              await SecureStore.setItemAsync('userToken', fallbackToken);
-            }
+            // Do NOT generate a fake fallback token — without a valid JWT,
+            // authenticated API calls will fail. The user will need connectivity.
           }
         } catch (backendErr) {
-          // Non-blocking: login works offline
+          // Non-blocking: login works offline with existing token
           console.warn('Could not login with backend:', backendErr);
-          const existingToken = await SecureStore.getItemAsync('userToken');
-          if (!existingToken) {
-            const fallbackToken = uuidv4();
-            await SecureStore.setItemAsync('userToken', fallbackToken);
-          }
+          // Keep existing token if we have one; don't generate a fake one
         }
       }
 

@@ -21,21 +21,26 @@ const HomeScreen: React.FC = () => {
   
   useEffect(() => {
     // Start animations when component mounts
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    const fadeAnimRef = Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 800,
+      useNativeDriver: true,
+    });
+    const slideAnimRef = Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 600,
+      useNativeDriver: true,
+    });
+    Animated.parallel([fadeAnimRef, slideAnimRef]).start();
     
     // Refresh balance when component mounts
     refreshBalance();
+
+    // Cleanup animations on unmount
+    return () => {
+      fadeAnimRef.stop();
+      slideAnimRef.stop();
+    };
   }, []);
   
   const onRefresh = async () => {

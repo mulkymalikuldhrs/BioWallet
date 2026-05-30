@@ -13,7 +13,7 @@ router.post('/register', authRateLimiter, validateBody(registerWalletSchema), re
 // Get wallet balance (public — blockchain data is public)
 router.get('/balance/:address', getWalletBalance);
 
-// Get wallet transactions (public — blockchain data is public)
-router.get('/transactions/:address', getWalletTransactions);
+// Get wallet transactions (requires auth — IDOR protection for DB records)
+router.get('/transactions/:address', authMiddleware, getWalletTransactions);
 
 export default router;

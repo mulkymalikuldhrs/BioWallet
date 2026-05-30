@@ -2,13 +2,15 @@ import express from 'express';
 import { prisma } from '../index';
 import { generateToken } from '../middleware/auth';
 import { strictRateLimiter } from '../middleware/rateLimiter';
+import { validateBody } from '../validators/middleware';
+import { loginSchema } from '../validators/schemas';
 
 const router = express.Router();
 
 // Login: authenticate a user by wallet address and return a JWT token
 // In a biometric wallet, the client proves identity via biometric auth locally,
 // then requests a JWT from the backend by proving they own the wallet address.
-router.post('/login', strictRateLimiter, async (req, res) => {
+router.post('/login', strictRateLimiter, validateBody(loginSchema), async (req, res) => {
   try {
     const { walletAddress, deviceId } = req.body;
 

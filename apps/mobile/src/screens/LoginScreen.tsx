@@ -19,13 +19,14 @@ const LoginScreen: React.FC = () => {
   const pulseAnim = React.useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    Animated.timing(fadeAnim, {
+    const fadeAnimRef = Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 800,
       useNativeDriver: true,
-    }).start();
+    });
+    fadeAnimRef.start();
 
-    Animated.loop(
+    const pulseLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
           toValue: 1.1,
@@ -38,7 +39,8 @@ const LoginScreen: React.FC = () => {
           useNativeDriver: true,
         }),
       ])
-    ).start();
+    );
+    pulseLoop.start();
 
     const checkBiometrics = async () => {
       try {
@@ -56,6 +58,12 @@ const LoginScreen: React.FC = () => {
     };
 
     checkBiometrics();
+
+    // Cleanup animations on unmount to prevent memory leaks
+    return () => {
+      fadeAnimRef.stop();
+      pulseLoop.stop();
+    };
   }, []);
 
   const handleLogin = async () => {
