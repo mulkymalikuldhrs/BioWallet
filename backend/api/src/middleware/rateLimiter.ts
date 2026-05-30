@@ -7,7 +7,10 @@ interface RateLimitEntry {
 
 /**
  * Simple in-memory rate limiter
- * In production, use Redis-backed rate limiting for distributed systems
+ *
+ * NOTE: In production, use Redis-backed rate limiting (e.g., `rate-limit-redis`)
+ * for distributed systems. In-memory rate limiting does NOT work across
+ * multiple instances/processes and will be lost on restart.
  */
 const rateLimitMap = new Map<string, RateLimitEntry>();
 
@@ -58,14 +61,26 @@ export const rateLimiter = (windowMs: number = 60 * 1000, maxRequests: number = 
 };
 
 /**
- * Default rate limiter: 60 requests per minute
+ * Default rate limiter: 60 requests per minute (general API)
  */
 export const defaultRateLimiter = rateLimiter(60 * 1000, 60);
+
+/**
+ * Auth rate limiter for login/register routes: 5 requests per minute
+ * Strict to prevent brute-force and spam account creation
+ */
+export const authRateLimiter = rateLimiter(60 * 1000, 5);
 
 /**
  * Strict rate limiter for sensitive endpoints: 10 requests per minute
  */
 export const strictRateLimiter = rateLimiter(60 * 1000, 10);
+
+/**
+ * Transaction rate limiter: 10 requests per minute
+ * Prevents transaction spam / flooding
+ */
+export const transactionRateLimiter = rateLimiter(60 * 1000, 10);
 
 /**
  * Admin rate limiter: 30 requests per minute

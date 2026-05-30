@@ -1,17 +1,19 @@
 import express from 'express';
 import { registerWallet, getWalletBalance, getWalletTransactions } from '../controllers/walletController';
 import { authMiddleware } from '../middleware/auth';
-import { strictRateLimiter } from '../middleware/rateLimiter';
+import { strictRateLimiter, authRateLimiter } from '../middleware/rateLimiter';
+import { validateBody } from '../validators/middleware';
+import { registerWalletSchema } from '../validators/schemas';
 
 const router = express.Router();
 
-// Register a new wallet (public, but rate limited)
-router.post('/register', strictRateLimiter, registerWallet);
+// Register a new wallet (public, but rate limited strictly for auth-like endpoint)
+router.post('/register', authRateLimiter, validateBody(registerWalletSchema), registerWallet);
 
-// Get wallet balance (requires auth)
-router.get('/balance/:address', authMiddleware, getWalletBalance);
+// Get wallet balance (public — blockchain data is public)
+router.get('/balance/:address', getWalletBalance);
 
-// Get wallet transactions (requires auth)
-router.get('/transactions/:address', authMiddleware, getWalletTransactions);
+// Get wallet transactions (public — blockchain data is public)
+router.get('/transactions/:address', getWalletTransactions);
 
 export default router;

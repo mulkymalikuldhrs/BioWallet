@@ -8,7 +8,7 @@ import userRoutes from './routes/userRoutes';
 import walletRoutes from './routes/walletRoutes';
 import transactionRoutes from './routes/transactionRoutes';
 import adminRoutes from './routes/adminRoutes';
-import { defaultRateLimiter, strictRateLimiter } from './middleware/rateLimiter';
+import { defaultRateLimiter } from './middleware/rateLimiter';
 
 dotenv.config();
 
@@ -16,16 +16,70 @@ const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
+// Trust first proxy — required for correct IP resolution behind load balancers / reverse proxies
+// In production, set to the number of proxies between the internet and your server
+app.set('trust proxy', 1);
+
+// ─── CORS Configuration ───────────────────────────────────────────────
+// Defaults to http://localhost:3000 for development if CORS_ORIGIN is not set.
+// In production, CORS_ORIGIN must be set to a comma-separated list of allowed origins.
+const corsOrigin = (() => {
+  const configured = process.env.CORS_ORIGIN;
+  if (!configured) {
+    console.warn('CORS_ORIGIN not set, defaulting to http://localhost:3000 (development only)');
+    return 'http://localhost:3000';
+  }
+  // Support comma-separated list of origins
+  const origins = configured.split(',').map((o) => o.trim()).filter(Boolean);
+  return origins.length === 1 ? origins[0] : origins;
+})();
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: corsOrigin,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-API-Key'],
+  credentials: true,
 }));
-app.use(helmet());
-app.use(morgan('dev'));
-app.use(express.json());
 
+// ─── Helmet Security Headers ──────────────────────────────────────────
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'none'"],              // API only — no default sources
+      scriptSrc: ["'none'"],                // No inline scripts in API responses
+      styleSrc: ["'none'"],                 // No styles needed for API
+      imgSrc: ["'none'"],                   // No images from API
+      connectSrc: [
+        "'self'",                            // Allow same-origin connections
+        process.env.ETHEREUM_RPC_URL || 'https://rpc.ankr.com/eth_sepolia', // Blockchain RPC
+      ],
+      frameSrc: ["'none'"],                 // Prevent framing (clickjacking protection)
+      frameAncestors: ["'none'"],           // X-Frame-Options equivalent
+      objectSrc: ["'none'"],                // No plugins
+      baseUri: ["'none'"],                  // No <base> tag manipulation
+      formAction: ["'none'"],               // No form submissions from API
+    },
+  },
+  crossOriginEmbedderPolicy: true,
+  crossOriginOpenerPolicy: true,
+  crossOriginResourcePolicy: true,
+  referrerPolicy: { policy: 'no-referrer' },
+  xContentTypeOptions: true,    // X-Content-Type-Options: nosniff
+  xDnsPrefetchControl: { allow: false },
+  xDownloadOptions: true,
+  xFrameOptions: { action: 'deny' },  // X-Frame-Options: DENY
+  xPermittedCrossDomainPolicies: { permittedPolicies: 'none' },
+  xXssProtection: true,
+}));
+
+// ─── Request Parsing ──────────────────────────────────────────────────
+// Limit JSON body to 10kb to prevent oversized payload attacks
+app.use(express.json({ limit: '10kb' }));
+
+// ─── Logging ──────────────────────────────────────────────────────────
+app.use(morgan('dev'));
+
+// ─── Rate Limiting ────────────────────────────────────────────────────
 // Apply default rate limiting to all routes
 app.use(defaultRateLimiter);
 
@@ -35,7 +89,7 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
-// Public routes (with strict rate limiting for creation endpoints)
+// Public routes (with strict rate limiting for creation endpoints applied in route files)
 app.use('/api/users', userRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/transactions', transactionRoutes);
@@ -43,13 +97,31 @@ app.use('/api/transactions', transactionRoutes);
 // Admin routes (protected by admin auth middleware in routes)
 app.use('/api/admin', adminRoutes);
 
-// Error handling
+// ─── 404 Handler ──────────────────────────────────────────────────────
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
+// ─── Error Handler ────────────────────────────────────────────────────
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({
-    message: 'An unexpected error occurred',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
+  // Always log the full error server-side
+  console.error(err.stack || err);
+
+  const isDev = process.env.NODE_ENV === 'development';
+  const statusCode = err.statusCode || 500;
+
+  if (isDev) {
+    // In development: return error details, but only stack trace for non-500 errors
+    res.status(statusCode).json({
+      message: err.message || 'An unexpected error occurred',
+      ...(statusCode !== 500 && { stack: err.stack }),
+    });
+  } else {
+    // In production: never return error details to the client
+    res.status(statusCode).json({
+      message: statusCode === 500 ? 'An unexpected error occurred' : err.message || 'Request failed',
+    });
+  }
 });
 
 // Start server

@@ -60,10 +60,10 @@ const LoginScreen: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      const success = await login();
-      if (success) {
-        const walletAddress = await generateWalletFromBiometric();
-        if (walletAddress) {
+      const result = await login();
+      if (result.success) {
+        const walletAddr = await generateWalletFromBiometric();
+        if (walletAddr) {
           navigation.reset({
             index: 0,
             routes: [{ name: 'Main' as never }],

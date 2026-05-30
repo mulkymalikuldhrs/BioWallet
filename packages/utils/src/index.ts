@@ -1,5 +1,8 @@
 import { ethers } from 'ethers';
 
+// Re-export shared types
+export * from './types';
+
 /**
  * Extract entropy from WebAuthn authentication/registration result
  * @param authResult - The WebAuthn result (authentication or registration)
@@ -18,11 +21,7 @@ export function extractEntropy(authResult: any): string {
     return ethers.hexlify(new Uint8Array(prfResults.results.first));
   }
 
-  const localSecret = typeof window !== 'undefined' ? localStorage.getItem('biowallet_local_secret') : null;
-  if (localSecret) {
-    return ethers.keccak256(ethers.toUtf8Bytes(id + localSecret));
-  }
-
+  // No longer fall back to localStorage secret — caller should handle fallback
   return id;
 }
 

@@ -2,6 +2,8 @@ import express from 'express';
 import { getStats, getDailyStats, getUserGrowth, getTransactionVolume } from '../controllers/adminController';
 import { adminAuthMiddleware } from '../middleware/auth';
 import { adminRateLimiter } from '../middleware/rateLimiter';
+import { validateQuery } from '../validators/middleware';
+import { dailyStatsQuerySchema, periodQuerySchema } from '../validators/schemas';
 
 const router = express.Router();
 
@@ -12,13 +14,13 @@ router.use(adminRateLimiter);
 // Get overall stats
 router.get('/stats', getStats);
 
-// Get daily stats
-router.get('/stats/daily', getDailyStats);
+// Get daily stats (with query validation)
+router.get('/stats/daily', validateQuery(dailyStatsQuerySchema), getDailyStats);
 
-// Get user growth
-router.get('/stats/users', getUserGrowth);
+// Get user growth (with query validation)
+router.get('/stats/users', validateQuery(periodQuerySchema), getUserGrowth);
 
-// Get transaction volume
-router.get('/stats/volume', getTransactionVolume);
+// Get transaction volume (with query validation)
+router.get('/stats/volume', validateQuery(periodQuerySchema), getTransactionVolume);
 
 export default router;

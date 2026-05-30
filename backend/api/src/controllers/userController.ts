@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../index';
-import { BiometricType } from '@prisma/client';
+import { BiometricType, Prisma } from '@prisma/client';
+import { generateToken } from '../middleware/auth';
 
 // Create a new user
 export const createUser = async (req: Request, res: Response) => {
@@ -24,6 +25,17 @@ export const createUser = async (req: Request, res: Response) => {
     // Generate referral code
     const referralCode = `BIO${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
+    // Resolve referrer by referral code (referredBy is a code, not an ID)
+    let referredById: string | undefined;
+    if (referredBy) {
+      const referrer = await prisma.user.findFirst({
+        where: { referralCode: referredBy }
+      });
+      if (referrer) {
+        referredById = referrer.id;
+      }
+    }
+
     // Create new user
     const user = await prisma.user.create({
       data: {
@@ -33,14 +45,18 @@ export const createUser = async (req: Request, res: Response) => {
         deviceId,
         biometricType: biometricType as BiometricType,
         referralCode,
-        referredBy
+        referredById
       }
     });
+
+    // Generate JWT token for the newly created user
+    const token = generateToken(user.id, user.walletAddress);
 
     res.status(201).json({
       id: user.id,
       walletAddress: user.walletAddress,
       referralCode: user.referralCode,
+      token,
       message: 'User registered successfully'
     });
   } catch (error) {
@@ -98,14 +114,14 @@ export const updateUser = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Invalid ID' });
     }
 
+    const updateData: any = { email, deviceId, lastLogin: new Date() };
+    if (isPremium !== undefined) {
+      updateData.isPremium = isPremium;
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id },
-      data: {
-        email,
-        deviceId,
-        isPremium,
-        lastLogin: new Date()
-      },
+      data: updateData,
       select: {
         id: true,
         walletAddress: true,

@@ -3,6 +3,23 @@ import { useRouter } from 'next/router';
 import { useAuth } from '@/context/AuthContext';
 import { useWallet } from '@/context/WalletContext';
 import { extractEntropy } from 'utils';
+import { ethers } from 'ethers';
+
+// SSR-safe localStorage wrapper
+const safeLocalStorage = {
+  getItem: (key: string): string | null => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(key);
+  },
+  setItem: (key: string, value: string): void => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(key, value);
+  },
+  removeItem: (key: string): void => {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(key);
+  },
+};
 
 export default function Dashboard() {
   const router = useRouter();
@@ -13,6 +30,11 @@ export default function Dashboard() {
   const [amount, setAmount] = useState('');
   const [txHash, setTxHash] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -28,14 +50,37 @@ export default function Dashboard() {
     e.preventDefault();
     setIsSending(true);
     try {
+      // Check WebAuthn availability
+      if (typeof window === 'undefined' || !navigator.credentials) {
+        throw new Error('WebAuthn is not available. Cannot sign transaction.');
+      }
+
       // Re-authenticate for transaction signing
       const authResult = await login();
       if (!authResult.success || !authResult.credentialId) {
         throw new Error('Authentication failed');
       }
 
-      const entropySource = extractEntropy(authResult);
-      const salt = 'biowallet-salt-v1';
+      let entropySource = extractEntropy(authResult);
+
+      // If PRF not available, combine with stored PIN
+      const prfAvailable = !!(authResult as any).clientExtensionResults?.prf?.results?.first;
+      if (!prfAvailable) {
+        const storedPin = safeLocalStorage.getItem('biowallet_user_pin');
+        if (storedPin) {
+          entropySource = ethers.keccak256(
+            ethers.toUtf8Bytes(authResult.credentialId! + storedPin)
+          );
+        }
+      }
+
+      // Use per-user salt
+      let salt = safeLocalStorage.getItem('biowallet_salt');
+      if (!salt) {
+        salt = `biowallet-salt-${authResult.credentialId.slice(0, 8)}`;
+        safeLocalStorage.setItem('biowallet_salt', salt);
+      }
+
       const hash = await sendTransaction(recipient, amount, entropySource, salt);
       if (hash) {
         setTxHash(hash);
@@ -51,13 +96,14 @@ export default function Dashboard() {
   };
 
   const copyAddress = () => {
-    if (walletAddress) {
+    if (walletAddress && typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(walletAddress);
       alert('Address copied to clipboard');
     }
   };
 
-  if (authLoading || !isAuthenticated) {
+  // Don't render auth-dependent UI on server
+  if (!isClient || authLoading || !isAuthenticated) {
     return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
   }
 

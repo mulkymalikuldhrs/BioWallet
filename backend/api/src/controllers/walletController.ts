@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { ethers } from 'ethers';
 import { prisma } from '../index';
-import { BiometricType } from '@prisma/client';
+import { BiometricType, Prisma } from '@prisma/client';
+import { generateToken } from '../middleware/auth';
 
 // Provider for Ethereum testnet (Sepolia)
 const provider = new ethers.JsonRpcProvider(process.env.ETHEREUM_RPC_URL || 'https://rpc.ankr.com/eth_sepolia');
@@ -28,6 +29,17 @@ export const registerWallet = async (req: Request, res: Response) => {
     // Generate referral code
     const referralCode = `BIO${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
+    // Resolve referrer by referral code
+    let referrerId: string | undefined;
+    if (referredBy) {
+      const referrer = await prisma.user.findFirst({
+        where: { referralCode: referredBy }
+      });
+      if (referrer) {
+        referrerId = referrer.id;
+      }
+    }
+
     // Create new user with wallet
     const user = await prisma.user.create({
       data: {
@@ -37,31 +49,29 @@ export const registerWallet = async (req: Request, res: Response) => {
         deviceId,
         email,
         referralCode,
-        referredBy
+        referredById: referrerId
       }
     });
 
-    // If user was referred, create referral reward
-    if (referredBy) {
-      const referrer = await prisma.user.findFirst({
-        where: { referralCode: referredBy }
-      });
+    // Generate JWT token for the newly registered user
+    const token = generateToken(user.id, user.walletAddress);
 
-      if (referrer) {
-        await prisma.referralReward.create({
-          data: {
-            userId: referrer.id,
-            amount: 0.001, // Small ETH reward
-            status: 'PENDING'
-          }
-        });
-      }
+    // If user was referred, create referral reward for the referrer
+    if (referrerId) {
+      await prisma.referralReward.create({
+        data: {
+          userId: referrerId,
+          amount: new Prisma.Decimal('0.001'), // Small ETH reward
+          status: 'PENDING'
+        }
+      });
     }
 
     res.status(201).json({
       id: user.id,
       walletAddress: user.walletAddress,
-      referralCode: user.referralCode
+      referralCode: user.referralCode,
+      token,
     });
   } catch (error) {
     console.error('Error registering wallet:', error);

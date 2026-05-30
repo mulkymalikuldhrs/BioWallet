@@ -1,18 +1,29 @@
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
+import type { AuthContextType } from 'utils';
 
-interface AuthContextType {
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
-  register: (walletAddress: string, publicKey: string, credentialId: string) => Promise<boolean>;
-  login: () => Promise<{ success: boolean; credentialId?: string }>;
-  logout: () => Promise<void>;
+// SSR-safe localStorage wrapper
+const safeLocalStorage = {
+  getItem: (key: string): string | null => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(key);
+  },
+  setItem: (key: string, value: string): void => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(key, value);
+  },
+  removeItem: (key: string): void => {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(key);
+  },
+};
+
+interface WebAuthContextType extends AuthContextType {
   getRegistrationOptions: (walletAddress: string) => any;
   getAuthenticationOptions: () => any;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<WebAuthContextType | undefined>(undefined);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -22,13 +33,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('userToken');
+    const token = safeLocalStorage.getItem('userToken');
     if (token) {
       setIsAuthenticated(true);
     }
   }, []);
 
   const getRegistrationOptions = (walletAddress: string) => {
+    if (typeof window === 'undefined') return {};
+
     const randomChallenge = new Uint8Array(32);
     window.crypto.getRandomValues(randomChallenge);
 
@@ -47,6 +60,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const getAuthenticationOptions = () => {
+    if (typeof window === 'undefined') return {};
+
     const randomChallenge = new Uint8Array(32);
     window.crypto.getRandomValues(randomChallenge);
 
@@ -63,6 +78,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setError(null);
 
     try {
+      const deviceId = safeLocalStorage.getItem('deviceId') || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'web-device');
+
       const response = await fetch(`${API_URL}/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -71,25 +88,49 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           publicKey,
           credentialId,
           biometricType: 'FINGERPRINT',
-          deviceId: localStorage.getItem('deviceId') || crypto.randomUUID(),
+          deviceId,
         }),
       });
 
       if (!response.ok) {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
+        // 409 means already registered — that's okay
+        if (response.status === 409) {
+          // Try to login instead
+          try {
+            const loginResponse = await fetch(`${API_URL}/auth/login`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ walletAddress, deviceId }),
+            });
+            if (loginResponse.ok) {
+              const loginData = await loginResponse.json();
+              safeLocalStorage.setItem('userToken', loginData.token);
+              safeLocalStorage.setItem('isRegistered', 'true');
+              safeLocalStorage.setItem('credentialId', credentialId);
+              setIsAuthenticated(true);
+              return true;
+            }
+          } catch {
+            // Fall through
+          }
+        }
         throw new Error(data.message || 'Failed to register on backend');
       }
 
       const userData = await response.json();
-      localStorage.setItem('userToken', userData.id);
-      localStorage.setItem('isRegistered', 'true');
-      localStorage.setItem('credentialId', credentialId);
+      safeLocalStorage.setItem('userToken', userData.token || userData.id);
+      safeLocalStorage.setItem('isRegistered', 'true');
+      safeLocalStorage.setItem('credentialId', credentialId);
+      if (userData.id) {
+        safeLocalStorage.setItem('userId', userData.id);
+      }
       setIsAuthenticated(true);
 
       return true;
-    } catch (error) {
-      console.error('Error registering:', error);
-      setError(error instanceof Error ? error.message : 'Registration failed');
+    } catch (err) {
+      console.error('Error registering:', err);
+      setError(err instanceof Error ? err.message : 'Registration failed');
       return false;
     } finally {
       setIsLoading(false);
@@ -101,7 +142,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setError(null);
 
     try {
-      const isRegistered = localStorage.getItem('isRegistered');
+      // Check if window/navigator is available (SSR safety)
+      if (typeof window === 'undefined' || !navigator.credentials) {
+        throw new Error('WebAuthn is not available in this environment');
+      }
+
+      const isRegistered = safeLocalStorage.getItem('isRegistered');
       if (isRegistered !== 'true') {
         throw new Error('Not registered. Please register first');
       }
@@ -122,19 +168,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       const credential = await startAuthentication(optionsWithPRF as any);
 
-      // Generate a session token from the credential ID and timestamp
-      const sessionToken = crypto.randomUUID();
-      localStorage.setItem('userToken', sessionToken);
-      localStorage.setItem('credentialId', credential.id);
+      // Get JWT from backend
+      const walletAddress = safeLocalStorage.getItem('walletAddress');
+      if (walletAddress) {
+        try {
+          const response = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ walletAddress }),
+          });
+          if (response.ok) {
+            const data = await response.json();
+            safeLocalStorage.setItem('userToken', data.token);
+            if (data.id) {
+              safeLocalStorage.setItem('userId', data.id);
+            }
+          }
+        } catch {
+          // Fall back to session token
+          const sessionToken = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
+          safeLocalStorage.setItem('userToken', sessionToken);
+        }
+      } else {
+        const sessionToken = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
+        safeLocalStorage.setItem('userToken', sessionToken);
+      }
+
+      safeLocalStorage.setItem('credentialId', credential.id);
       setIsAuthenticated(true);
       return {
         success: true,
         credentialId: credential.id,
         clientExtensionResults: (credential as any).clientExtensionResults
       };
-    } catch (error) {
-      console.error('Error logging in:', error);
-      setError(error instanceof Error ? error.message : 'Login failed');
+    } catch (err) {
+      console.error('Error logging in:', err);
+      setError(err instanceof Error ? err.message : 'Login failed');
       return { success: false };
     } finally {
       setIsLoading(false);
@@ -142,7 +211,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async (): Promise<void> => {
-    localStorage.removeItem('userToken');
+    safeLocalStorage.removeItem('userToken');
     setIsAuthenticated(false);
   };
 

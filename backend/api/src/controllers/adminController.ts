@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../index';
 
 // Get overall stats
@@ -16,7 +17,7 @@ export const getStats = async (req: Request, res: Response) => {
         amount: true
       }
     });
-    const totalVolume = volumeResult._sum.amount || 0;
+    const totalVolume = volumeResult._sum.amount?.toString() || '0';
 
     // Get total fees
     const feesResult = await prisma.transaction.aggregate({
@@ -24,7 +25,7 @@ export const getStats = async (req: Request, res: Response) => {
         fee: true
       }
     });
-    const totalFees = feesResult._sum.fee || 0;
+    const totalFees = feesResult._sum.fee?.toString() || '0';
 
     // Get new users in last 24 hours
     const newUsers = await prisma.user.count({
@@ -125,8 +126,8 @@ export const getDailyStats = async (req: Request, res: Response) => {
         date: date.toISOString().split('T')[0],
         newUsers,
         transactions,
-        volume: volumeResult._sum.amount || 0,
-        fees: feesResult._sum.fee || 0
+        volume: volumeResult._sum.amount?.toString() || '0',
+        fees: feesResult._sum.fee?.toString() || '0'
       });
     }
     
@@ -229,9 +230,9 @@ export const getTransactionVolume = async (req: Request, res: Response) => {
     });
     
     // Process the data to group by period
-    const groupedData: Record<string, { volume: number, fees: number }> = {};
+    const groupedData: Record<string, { volume: Prisma.Decimal, fees: Prisma.Decimal }> = {};
     
-    transactions.forEach((tx: { createdAt: Date, amount: number, fee: number }) => {
+    transactions.forEach((tx: { createdAt: Date, amount: Prisma.Decimal, fee: Prisma.Decimal }) => {
       let key: string;
       const date = new Date(tx.createdAt);
       
@@ -245,18 +246,18 @@ export const getTransactionVolume = async (req: Request, res: Response) => {
       }
       
       if (!groupedData[key]) {
-        groupedData[key] = { volume: 0, fees: 0 };
+        groupedData[key] = { volume: new Prisma.Decimal(0), fees: new Prisma.Decimal(0) };
       }
       
-      groupedData[key].volume += tx.amount;
-      groupedData[key].fees += tx.fee;
+      groupedData[key].volume = groupedData[key].volume.add(tx.amount);
+      groupedData[key].fees = groupedData[key].fees.add(tx.fee);
     });
     
     // Convert to array format
     const result = Object.entries(groupedData).map(([date, data]) => ({
       date,
-      volume: data.volume,
-      fees: data.fees
+      volume: data.volume.toString(),
+      fees: data.fees.toString()
     }));
     
     res.status(200).json(result);

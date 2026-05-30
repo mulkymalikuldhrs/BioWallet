@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Animated, RefreshControl, Modal, Alert } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useWallet } from '../context/WalletContext';
 import { Ionicons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
+import Clipboard from '@react-native-clipboard/clipboard';
+import { useNavigation } from '@react-navigation/native';
 
 const HomeScreen: React.FC = () => {
   const { colors, isDark } = useTheme();
   const { walletAddress, balance, refreshBalance, isLoading } = useWallet();
+  const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
+  const [showReceiveModal, setShowReceiveModal] = useState(false);
+  const [copied, setCopied] = useState(false);
   
   // Animation values
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
@@ -37,6 +42,15 @@ const HomeScreen: React.FC = () => {
     setRefreshing(true);
     await refreshBalance();
     setRefreshing(false);
+  };
+
+  // Copy address to clipboard
+  const copyAddress = () => {
+    if (walletAddress) {
+      Clipboard.setString(walletAddress);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
   
   // Format wallet address for display
@@ -71,7 +85,7 @@ const HomeScreen: React.FC = () => {
           <Text style={[styles.balanceLabel, { color: colors.secondary }]}>
             Your Balance
           </Text>
-          <TouchableOpacity onPress={refreshBalance}>
+          <TouchableOpacity onPress={() => refreshBalance()}>
             <Ionicons name="refresh" size={24} color={colors.primary} />
           </TouchableOpacity>
         </View>
@@ -120,13 +134,12 @@ const HomeScreen: React.FC = () => {
           
           <TouchableOpacity
             style={[styles.copyButton, { backgroundColor: colors.primary + '20' }]}
-            onPress={() => {
-              // Copy address to clipboard
-              // This would be implemented in a real app
-            }}
+            onPress={copyAddress}
           >
-            <Ionicons name="copy-outline" size={20} color={colors.primary} />
-            <Text style={[styles.copyText, { color: colors.primary }]}>Copy</Text>
+            <Ionicons name={copied ? 'checkmark' : 'copy-outline'} size={20} color={colors.primary} />
+            <Text style={[styles.copyText, { color: colors.primary }]}>
+              {copied ? 'Copied!' : 'Copy'}
+            </Text>
           </TouchableOpacity>
         </View>
       </Animated.View>
@@ -149,8 +162,8 @@ const HomeScreen: React.FC = () => {
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: colors.primary + '10' }]}
             onPress={() => {
-              // Navigate to send screen
-              // This would be implemented in a real app
+              // Navigate to Send tab
+              navigation.navigate('Send' as never);
             }}
           >
             <View style={[styles.actionIcon, { backgroundColor: colors.primary + '20' }]}>
@@ -162,8 +175,8 @@ const HomeScreen: React.FC = () => {
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: colors.success + '10' }]}
             onPress={() => {
-              // Navigate to receive screen
-              // This would be implemented in a real app
+              // Show receive modal with QR code
+              setShowReceiveModal(true);
             }}
           >
             <View style={[styles.actionIcon, { backgroundColor: colors.success + '20' }]}>
@@ -175,8 +188,8 @@ const HomeScreen: React.FC = () => {
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: colors.accent + '10' }]}
             onPress={() => {
-              // Navigate to history screen
-              // This would be implemented in a real app
+              // Navigate to History tab
+              navigation.navigate('History' as never);
             }}
           >
             <View style={[styles.actionIcon, { backgroundColor: colors.accent + '20' }]}>
@@ -188,8 +201,8 @@ const HomeScreen: React.FC = () => {
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: colors.secondary + '10' }]}
             onPress={() => {
-              // Navigate to settings screen
-              // This would be implemented in a real app
+              // Navigate to Profile/Settings tab
+              navigation.navigate('Profile' as never);
             }}
           >
             <View style={[styles.actionIcon, { backgroundColor: colors.secondary + '20' }]}>
@@ -199,6 +212,61 @@ const HomeScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </Animated.View>
+
+      {/* Receive Modal */}
+      <Modal
+        visible={showReceiveModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowReceiveModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>Receive ETH</Text>
+              <TouchableOpacity onPress={() => setShowReceiveModal(false)}>
+                <Ionicons name="close" size={28} color={colors.secondary} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={[styles.modalSubtitle, { color: colors.secondary }]}>
+              Share your wallet address to receive ETH on Sepolia testnet
+            </Text>
+
+            <View style={styles.modalQrContainer}>
+              {walletAddress && (
+                <View style={[styles.qrBg, { backgroundColor: colors.background }]}>
+                  <QRCode
+                    value={walletAddress}
+                    size={200}
+                    color={isDark ? '#FFFFFF' : '#000000'}
+                    backgroundColor="transparent"
+                  />
+                </View>
+              )}
+            </View>
+
+            <View style={[styles.modalAddressBox, { backgroundColor: colors.background }]}>
+              <Text style={[styles.modalAddress, { color: colors.text }]} numberOfLines={2}>
+                {walletAddress}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.copyFullButton, { backgroundColor: colors.primary }]}
+              onPress={() => {
+                if (walletAddress) {
+                  Clipboard.setString(walletAddress);
+                  Alert.alert('Copied!', 'Wallet address copied to clipboard');
+                }
+              }}
+            >
+              <Ionicons name="copy-outline" size={20} color="#FFFFFF" />
+              <Text style={styles.copyFullButtonText}>Copy Address</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -332,6 +400,68 @@ const styles = StyleSheet.create({
   actionText: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    paddingBottom: 40,
+    alignItems: 'center',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 8,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalQrContainer: {
+    marginBottom: 16,
+  },
+  qrBg: {
+    padding: 20,
+    borderRadius: 16,
+  },
+  modalAddressBox: {
+    width: '100%',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  modalAddress: {
+    fontSize: 13,
+    fontFamily: 'monospace',
+    textAlign: 'center',
+  },
+  copyFullButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    width: '100%',
+  },
+  copyFullButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
   },
 });
 

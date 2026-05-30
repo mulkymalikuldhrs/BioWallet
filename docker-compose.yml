@@ -1,20 +1,31 @@
 version: '3.8'
 
 services:
+  # ─── PostgreSQL Database ───────────────────────────────────
   postgres:
     container_name: biowallet-postgres
-    image: postgres:14
+    image: postgres:16-alpine
     ports:
       - "5432:5432"
+    env_file:
+      - ./backend/api/.env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: biowallet
+      POSTGRES_USER: ${POSTGRES_USER:-biowallet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-biowallet}
+      POSTGRES_DB: ${POSTGRES_DB:-biowallet}
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-biowallet} -d ${POSTGRES_DB:-biowallet}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
     networks:
       - biowallet-network
 
+  # ─── Express Backend API ──────────────────────────────────
   backend:
     container_name: biowallet-backend
     build:
@@ -22,17 +33,45 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3001:3001"
+    env_file:
+      - ./backend/api/.env
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/biowallet
-      NODE_ENV: development
+      DATABASE_URL: postgresql://${POSTGRES_USER:-biowallet}:${POSTGRES_PASSWORD:-biowallet}@postgres:5432/${POSTGRES_DB:-biowallet}
+      NODE_ENV: production
       PORT: 3001
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
     networks:
       - biowallet-network
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+
+  # ─── Next.js Web App ──────────────────────────────────────
+  web:
+    container_name: biowallet-web
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./apps/web/.env.local
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001/api}
+      NEXT_PUBLIC_RPC_URL: ${NEXT_PUBLIC_RPC_URL:-https://rpc.ankr.com/eth_sepolia}
+      NODE_ENV: production
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - biowallet-network
 
 networks:
   biowallet-network:
@@ -40,3 +79,4 @@ networks:
 
 volumes:
   postgres-data:
+    driver: local

@@ -1,14 +1,18 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Share } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useWallet } from '../context/WalletContext';
 import { useAuth } from '../context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
+
+type NetworkType = 'sepolia' | 'mainnet';
 
 const ProfileScreen: React.FC = () => {
-  const { colors, isDark, toggleTheme } = useTheme();
+  const { colors, isDark, setTheme } = useTheme();
   const { walletAddress, balance } = useWallet();
   const { logout } = useAuth();
+  const [selectedNetwork, setSelectedNetwork] = useState<NetworkType>('sepolia');
 
   const formatAddress = (address: string | null) => {
     if (!address) return 'Not connected';
@@ -32,12 +36,136 @@ const ProfileScreen: React.FC = () => {
     );
   };
 
+  const handleThemeToggle = () => {
+    setTheme(isDark ? 'light' : 'dark');
+  };
+
+  const handleSecuritySettings = () => {
+    Alert.alert(
+      'Security Settings',
+      'Biometric authentication is active.\n\nYour wallet is secured by your device biometrics. No seed phrase or password is stored.',
+      [
+        { text: 'OK' },
+        {
+          text: 'Reset Biometric Data',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Reset Biometric Data',
+              'This will clear all locally stored wallet data. You will need to re-register. Are you sure?',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Reset',
+                  style: 'destructive',
+                  onPress: async () => {
+                    try {
+                      await SecureStore.deleteItemAsync('walletAddress');
+                      await SecureStore.deleteItemAsync('biowallet_user_secret');
+                      await SecureStore.deleteItemAsync('biowallet_salt');
+                      await SecureStore.deleteItemAsync('isRegistered');
+                      await SecureStore.deleteItemAsync('biometricType');
+                      await SecureStore.deleteItemAsync('userToken');
+                      await SecureStore.deleteItemAsync('userId');
+                      Alert.alert('Reset Complete', 'All wallet data has been cleared. Please restart the app.');
+                    } catch (err) {
+                      console.error('Error resetting data:', err);
+                    }
+                  },
+                },
+              ]
+            );
+          },
+        },
+      ]
+    );
+  };
+
+  const handleExportWallet = async () => {
+    if (!walletAddress) {
+      Alert.alert('No Wallet', 'No wallet address found to export.');
+      return;
+    }
+
+    Alert.alert(
+      'Export Wallet',
+      'Choose how to share your wallet address:',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Share',
+          onPress: async () => {
+            try {
+              await Share.share({
+                message: `My BioWallet Address: ${walletAddress}`,
+                title: 'BioWallet Address',
+              });
+            } catch (err) {
+              console.error('Error sharing:', err);
+            }
+          },
+        },
+        {
+          text: 'Copy Address',
+          onPress: async () => {
+            try {
+              const Clipboard = (await import('@react-native-clipboard/clipboard')).default;
+              Clipboard.setString(walletAddress);
+              Alert.alert('Copied!', 'Wallet address copied to clipboard');
+            } catch {
+              Alert.alert('Error', 'Could not copy to clipboard');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleNetworkChange = () => {
+    Alert.alert(
+      'Select Network',
+      'Choose your Ethereum network:',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Sepolia Testnet',
+          onPress: () => setSelectedNetwork('sepolia'),
+        },
+        {
+          text: 'Ethereum Mainnet',
+          onPress: () => {
+            Alert.alert(
+              '⚠️ Warning',
+              'Mainnet transactions use real ETH. Are you sure you want to switch to Mainnet?',
+              [
+                { text: 'Cancel', style: 'cancel', onPress: () => {} },
+                { text: 'Switch to Mainnet', style: 'destructive', onPress: () => setSelectedNetwork('mainnet') },
+              ]
+            );
+          },
+        },
+      ]
+    );
+  };
+
   const settingsItems = [
     {
       icon: 'shield-checkmark-outline' as const,
       title: 'Security',
       subtitle: 'Biometric authentication settings',
-      onPress: () => Alert.alert('Security', 'Security settings coming soon'),
+      onPress: handleSecuritySettings,
+    },
+    {
+      icon: 'download-outline' as const,
+      title: 'Export Wallet',
+      subtitle: 'Share or copy wallet address',
+      onPress: handleExportWallet,
+    },
+    {
+      icon: 'globe-outline' as const,
+      title: 'Network',
+      subtitle: selectedNetwork === 'sepolia' ? 'Sepolia Testnet' : 'Ethereum Mainnet',
+      onPress: handleNetworkChange,
     },
     {
       icon: 'notifications-outline' as const,
@@ -49,7 +177,7 @@ const ProfileScreen: React.FC = () => {
       icon: isDark ? 'sunny-outline' : 'moon-outline',
       title: 'Theme',
       subtitle: isDark ? 'Dark mode active' : 'Light mode active',
-      onPress: toggleTheme,
+      onPress: handleThemeToggle,
     },
     {
       icon: 'information-circle-outline' as const,
@@ -72,7 +200,9 @@ const ProfileScreen: React.FC = () => {
         )}
         <View style={[styles.networkBadge, { backgroundColor: colors.accent + '20' }]}>
           <View style={[styles.networkDot, { backgroundColor: colors.accent }]} />
-          <Text style={[styles.networkText, { color: colors.accent }]}>Sepolia Testnet</Text>
+          <Text style={[styles.networkText, { color: colors.accent }]}>
+            {selectedNetwork === 'sepolia' ? 'Sepolia Testnet' : 'Ethereum Mainnet'}
+          </Text>
         </View>
       </View>
 

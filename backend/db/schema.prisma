@@ -11,59 +11,73 @@ datasource db {
 }
 
 model User {
-  id                String         @id @default(uuid())
-  walletAddress     String         @unique
-  publicKey         String
-  email             String?        @unique
-  deviceId          String?
-  biometricType     BiometricType
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  transactions      Transaction[]
-  referralCode      String?        @unique
-  referredBy        String?
-  referralRewards   ReferralReward[]
-  isPremium         Boolean        @default(false)
-  lastLogin         DateTime?
+  id              String           @id @default(uuid())
+  walletAddress   String           @unique
+  publicKey       String
+  email           String?          @unique
+  deviceId        String?          @unique
+  biometricType   BiometricType
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  transactions    Transaction[]
+  referralCode    String?          @unique
+  referredById    String?
+  referrer        User?            @relation("UserReferrals", fields: [referredById], references: [id])
+  referrals       User[]           @relation("UserReferrals")
+  referralRewards ReferralReward[]
+  isPremium       Boolean          @default(false)
+  lastLogin       DateTime?
+
+  @@index([email])
 }
 
 model Transaction {
-  id              String            @id @default(uuid())
-  txHash          String            @unique
-  type            TransactionType
-  token           String            @default("ETH")
-  amount          Float
-  fee             Float
-  status          TransactionStatus @default(PENDING)
-  fromAddress     String
-  toAddress       String
-  userId          String
-  user            User              @relation(fields: [userId], references: [id])
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  blockNumber     Int?
-  blockTimestamp  DateTime?
-  network         String            @default("sepolia")
+  id             String            @id @default(uuid())
+  txHash         String            @unique
+  type           TransactionType
+  token          String            @default("ETH")
+  amount         Decimal           @db.Decimal(65, 18)
+  fee            Decimal           @db.Decimal(65, 18)
+  status         TransactionStatus @default(PENDING)
+  fromAddress    String
+  toAddress      String
+  userId         String
+  user           User              @relation(fields: [userId], references: [id])
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  blockNumber    Int?
+  blockTimestamp DateTime?
+  network        String            @default("sepolia")
+
+  @@index([userId])
+  @@index([fromAddress])
+  @@index([toAddress])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model ReferralReward {
-  id              String    @id @default(uuid())
-  userId          String
-  user            User      @relation(fields: [userId], references: [id])
-  amount          Float
-  status          RewardStatus @default(PENDING)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id        String       @id @default(uuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  amount    Decimal      @db.Decimal(65, 18)
+  status    RewardStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([userId])
 }
 
 model AdminStats {
-  id                String    @id @default(uuid())
-  totalUsers        Int       @default(0)
-  totalTransactions Int       @default(0)
-  totalVolume       Float     @default(0)
-  totalFees         Float     @default(0)
-  date              DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id                Int      @id @default(autoincrement())
+  totalUsers        Int      @default(0)
+  totalTransactions Int      @default(0)
+  totalVolume       Decimal  @default(0) @db.Decimal(65, 18)
+  totalFees         Decimal  @default(0) @db.Decimal(65, 18)
+  date              DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([date])
 }
 
 enum BiometricType {

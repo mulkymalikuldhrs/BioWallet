@@ -4,17 +4,20 @@ import { ThemeProvider } from 'next-themes';
 import { WalletProvider } from '@/context/WalletContext';
 import { AuthProvider } from '@/context/AuthContext';
 import Layout from '@/components/Layout';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <ThemeProvider attribute="class">
-      <AuthProvider>
-        <WalletProvider>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </WalletProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider attribute="class">
+        <AuthProvider>
+          <WalletProvider>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </WalletProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
