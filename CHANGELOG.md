@@ -5,11 +5,19 @@ All notable changes to BioWallet will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0] - 2026-03-05
+## [2.0.0] - 2026-05-28
 
 ### 🚀 Production Ready Release
 
-This release includes critical bug fixes, security hardening, and production-ready improvements.
+This release includes critical bug fixes, security hardening, production-ready improvements, and a core tech stack upgrade.
+
+### Upgraded
+
+- **React & Next.js** — Upgraded to React 19.2.6 and Next.js 15.1.7 for the web application
+- **Ethereum Library** — Standardized on Ethers v6.16.0 across all packages
+- **Database Engine** — Upgraded to Prisma 6.19.3
+- **Development Tools** — Upgraded to Turbo v2.9.16 and TypeScript 5.9.3
+- **Testing Framework** — Upgraded to Jest 30.2.0 and Playwright 1.60.0
 
 ### Fixed
 
