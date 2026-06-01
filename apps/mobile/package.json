@@ -40,7 +40,7 @@
     "@types/react": "~18.0.0",
     "@types/react-native": "~0.71.0",
     "@types/uuid": "^9.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "5.9.3"
   },
   "private": true
 }

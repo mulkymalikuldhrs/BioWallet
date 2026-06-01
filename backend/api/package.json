@@ -23,18 +23,18 @@
     "helmet": "^7.2.0",
     "jsonwebtoken": "^9.0.0",
     "morgan": "^1.10.0",
-    "uuid": "^9.0.0",
-    "zod": "^3.23.8"
+    "uuid": "9.0.1",
+    "zod": "3.25.76"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/morgan": "^1.9.9",
-    "@types/node": "^20.17.19",
+    "@types/node": "20.19.41",
     "@types/uuid": "^9.0.0",
     "prisma": "6.19.3",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.7.3"
+    "typescript": "5.9.3"
   }
 }
