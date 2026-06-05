@@ -82,6 +82,7 @@ This release includes critical security fixes and production hardening:
 | 👨‍💼 **Admin Dashboard** | Protected admin dashboard for monitoring |
 | 🤝 **Referral System** | Built-in referral system to grow the user base |
 | 🔒 **API Security** | Bearer token auth, rate limiting, admin API key protection |
+| 🎙️ **Advanced Roadmap** | Future support for Voice recognition and Social Recovery (SSS) |
 
 ### 🚀 Quick Start
 
