@@ -81,30 +81,31 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
     };
 
     next();
-  } catch (err: any) {
-    if (err.name === 'TokenExpiredError') {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    if (error.name === 'TokenExpiredError') {
       res.status(401).json({ message: 'Token has expired. Please authenticate again.' });
       return;
     }
 
-    if (err.name === 'JsonWebTokenError') {
+    if (error.name === 'JsonWebTokenError') {
       res.status(401).json({ message: 'Invalid token.' });
       return;
     }
 
-    if (err.name === 'NotBeforeError') {
+    if (error.name === 'NotBeforeError') {
       res.status(401).json({ message: 'Token not yet active.' });
       return;
     }
 
     // JWT_SECRET not set or other configuration error
-    if (err.message && err.message.includes('JWT_SECRET')) {
-      console.error('SECURITY: ' + err.message);
+    if (error.message && error.message.includes('JWT_SECRET')) {
+      console.error('SECURITY: ' + error.message);
       res.status(503).json({ message: 'Authentication service is not configured' });
       return;
     }
 
-    console.error('JWT verification error:', err.message);
+    console.error('JWT verification error:', error.message);
     res.status(401).json({ message: 'Authentication failed' });
   }
 };
@@ -164,25 +165,26 @@ export const adminAuthMiddleware = (req: Request, res: Response, next: NextFunct
     };
 
     next();
-  } catch (err: any) {
-    if (err.name === 'TokenExpiredError') {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    if (error.name === 'TokenExpiredError') {
       res.status(401).json({ message: 'Token has expired. Please authenticate again.' });
       return;
     }
 
-    if (err.name === 'JsonWebTokenError') {
+    if (error.name === 'JsonWebTokenError') {
       res.status(401).json({ message: 'Invalid token.' });
       return;
     }
 
     // JWT_SECRET not set
-    if (err.message && err.message.includes('JWT_SECRET')) {
-      console.error('SECURITY: ' + err.message);
+    if (error.message && error.message.includes('JWT_SECRET')) {
+      console.error('SECURITY: ' + error.message);
       res.status(503).json({ message: 'Authentication service is not configured' });
       return;
     }
 
-    console.error('Admin JWT verification error:', err.message);
+    console.error('Admin JWT verification error:', error.message);
     res.status(401).json({ message: 'Authentication failed' });
   }
 };

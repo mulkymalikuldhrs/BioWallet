@@ -144,7 +144,7 @@ export const getUserGrowth = async (req: Request, res: Response) => {
     const { period = 'month' } = req.query;
     
     let dateFormat: string;
-    let groupBy: any;
+    let groupBy: Record<string, { extract: string; from: string }>;
     
     // Set date format and group by based on period
     if (period === 'day') {

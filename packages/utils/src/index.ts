@@ -8,14 +8,26 @@ export * from './types';
  * @param authResult - The WebAuthn result (authentication or registration)
  * @returns The extracted entropy source string
  */
-export function extractEntropy(authResult: any): string {
+interface AuthResult {
+  credentialId?: string;
+  id?: string;
+  clientExtensionResults?: {
+    prf?: {
+      results?: {
+        first?: Uint8Array;
+      };
+    };
+  };
+}
+
+export function extractEntropy(authResult: AuthResult): string {
   if (!authResult) return '';
 
   // If it's a registration result from @simplewebauthn/browser or a result with .id
   const id = authResult.credentialId || authResult.id;
   if (!id) return '';
 
-  const prfResults = authResult.clientExtensionResults?.prf || (authResult as any).clientExtensionResults?.prf;
+  const prfResults = authResult.clientExtensionResults?.prf;
 
   if (prfResults?.results?.first) {
     return ethers.hexlify(new Uint8Array(prfResults.results.first));

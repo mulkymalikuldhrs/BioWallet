@@ -159,7 +159,7 @@ export const getAllTransactions = async (req: Request, res: Response) => {
     const { userId, limit = '10', offset = '0' } = req.query;
 
     // IDOR protection: non-admin users can only see their own transactions
-    let where: any = {};
+    let where: Record<string, unknown> = {};
     if (req.user?.isAdmin && typeof userId === 'string') {
       where = { userId };
     } else if (!req.user?.isAdmin) {

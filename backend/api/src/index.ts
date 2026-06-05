@@ -107,12 +107,12 @@ app.use((req, res) => {
 });
 
 // ─── Error Handler ────────────────────────────────────────────────────
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   // Always log the full error server-side
   console.error(err.stack || err);
 
   const isDev = process.env.NODE_ENV === 'development';
-  const statusCode = err.statusCode || 500;
+  const statusCode = (err as { statusCode?: number }).statusCode || 500;
 
   if (isDev) {
     // In development: return error details, but only stack trace for non-500 errors

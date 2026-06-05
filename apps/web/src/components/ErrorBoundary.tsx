@@ -56,7 +56,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
           justifyContent: 'center',
           padding: '2rem',
           backgroundColor: '#f9fafb',
-        }}>
+        }} role="alert" aria-label="Application error">
           <div style={{
             maxWidth: '480px',
             width: '100%',
@@ -130,6 +130,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
               <button
                 onClick={this.handleReset}
+                aria-label="Try again"
                 style={{
                   padding: '0.625rem 1.25rem',
                   borderRadius: '0.5rem',
@@ -145,6 +146,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
               </button>
               <button
                 onClick={this.handleReload}
+                aria-label="Reload page"
                 style={{
                   padding: '0.625rem 1.25rem',
                   borderRadius: '0.5rem',

@@ -17,7 +17,7 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  register: (...args: any[]) => Promise<boolean>;
+  register: (email: string, deviceId: string) => Promise<boolean>;
   login: () => Promise<{ success: boolean; credentialId?: string }>;
   logout: () => Promise<void>;
 }

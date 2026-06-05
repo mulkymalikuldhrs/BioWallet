@@ -178,7 +178,7 @@ export const updateUser = async (req: Request, res: Response) => {
       return res.status(403).json({ message: 'Access denied: you can only update your own profile' });
     }
 
-    const updateData: any = { email, deviceId, lastLogin: new Date() };
+    const updateData: Record<string, unknown> = { email, deviceId, lastLogin: new Date() };
     if (isPremium !== undefined) {
       // Only admins can change isPremium status
       if (!authenticatedUser?.isAdmin) {
