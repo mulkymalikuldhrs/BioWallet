@@ -6,22 +6,7 @@ import { useWallet } from '@/context/WalletContext';
 import { MdFingerprint } from 'react-icons/md';
 import { ethers } from 'ethers';
 import { extractEntropy } from 'utils';
-
-// SSR-safe localStorage wrapper
-const safeLocalStorage = {
-  getItem: (key: string): string | null => {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem(key);
-  },
-  setItem: (key: string, value: string): void => {
-    if (typeof window === 'undefined') return;
-    localStorage.setItem(key, value);
-  },
-  removeItem: (key: string): void => {
-    if (typeof window === 'undefined') return;
-    localStorage.removeItem(key);
-  },
-};
+import { safeLocalStorage } from '@/lib/safeLocalStorage';
 
 export default function Login() {
   const router = useRouter();

@@ -10,8 +10,9 @@ We take the security of BioWallet seriously. If you discover a security vulnerab
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+| 3.0.x   | :white_check_mark: |
+| 2.0.x   | :white_check_mark: |
+| < 2.0   | :x:                |
 
 ## 📣 Reporting a Vulnerability
 
@@ -32,9 +33,23 @@ We will acknowledge your report within 48 hours and provide a detailed response 
 
 - All biometric data is processed locally on your device
 - Biometric data is never stored or transmitted
-- Deterministic key derivation uses Argon2 hashing
+- Deterministic key derivation uses **scrypt** (N=16384, r=8, p=1) for brute-force resistance
+- Private keys are derived deterministically from biometric entropy + per-user salt
+- WebAuthn PRF extension used for secure key derivation (with PIN fallback)
 - All sensitive data is encrypted
-- WebAuthn is used for secure biometric authentication
+- JWT authentication with issuer/audience validation on all API routes
+- Admin routes require both JWT and X-Admin-API-Key (timing-safe comparison)
+- Rate limiting on all endpoints (general, auth, transaction, admin)
+- Helmet security headers with strict CSP (API-only, no scripts/styles)
+- Input validation with Zod schemas on all API endpoints
+- IDOR protection: users can only access their own resources
+
+## ⚠️ Known Limitations
+
+- In-memory rate limiting does not work across multiple server instances (use Redis for production)
+- Web AuthContext does not generate fallback tokens — backend connectivity is required for JWT
+- The referral system has no abuse prevention beyond rate limiting
+- Email field is optional and not verified
 
 ## ⚠️ Disclaimer
 

@@ -6,7 +6,7 @@
 
 <br/>
 
-[![Version](https://img.shields.io/badge/version-2.0.0-2E9EF7?style=for-the-badge&logo=semver)](https://github.com/mulkymalikuldhrs/BioWallet)
+[![Version](https://img.shields.io/badge/version-3.0.0-2E9EF7?style=for-the-badge&logo=semver)](https://github.com/mulkymalikuldhrs/BioWallet)
 [![Status](https://img.shields.io/badge/status-Production_Ready-brightgreen?style=for-the-badge)](https://github.com/mulkymalikuldhrs/BioWallet)
 [![React Native](https://img.shields.io/badge/React_Native-Expo-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactnative.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -29,7 +29,7 @@
 
 BioWallet is a revolutionary crypto wallet that uses human biometrics — fingerprint, face, and iris — for deterministic key derivation, eliminating the need for passwords or seed phrases. Built as a monorepo with React Native (mobile), Next.js (web), and Express (backend), it provides a secure, user-friendly way to manage your cryptocurrency assets with biometric authentication at its core.
 
-### 🔐 v2.0.0 — Production Ready
+### 🔐 v3.0.0 — Production Ready
 
 This release includes critical security fixes and production hardening:
 
@@ -37,14 +37,16 @@ This release includes critical security fixes and production hardening:
 - **Replaced Argon2 with ethers.scrypt()**: More compatible, no invalid mnemonic bug — uses `new ethers.Wallet(privateKey)` instead of `fromPhrase()`
 - **Migrated from Goerli to Sepolia**: All RPC endpoints and network references updated to Sepolia testnet
 - **Replaced dummy authentication**: No more `dummy-token`; proper session tokens via `crypto.randomUUID()`
-- **Added auth middleware**: Bearer token authentication on all API routes; admin routes require `X-Admin-API-Key` header
+- **Added auth middleware**: Bearer token authentication on all API routes; admin routes require `X-Admin-API-Key` header with timing-safe comparison
 - **Added rate limiting**: Default (60/min), strict (10/min for sensitive endpoints), admin (30/min)
 - **Fixed WebAuthn challenges**: Replaced hardcoded `Uint8Array([1,2,3,4,5,6,7,8])` with `crypto.getRandomValues()`
+- **Removed fake token fallback**: Web client no longer generates fake session tokens when backend is unavailable
 - **Created missing mobile screens**: SendScreen, HistoryScreen, ProfileScreen, LoginScreen
 - **Added expo-linear-gradient**: Missing dependency now included
 - **Added utils package**: `extractEntropy()`, `formatAddress()`, `validateEmail()`
 - **Added shared-ui package**: Reusable UI components
 - **Added .env.example files**: Backend and web environment variable documentation
+- **Extracted safeLocalStorage**: Shared SSR-safe localStorage utility (DRY refactor)
 
 ### 🏗️ Architecture
 

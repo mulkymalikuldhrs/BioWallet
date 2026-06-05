@@ -1,22 +1,7 @@
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
 import type { AuthContextType } from 'utils';
-
-// SSR-safe localStorage wrapper
-const safeLocalStorage = {
-  getItem: (key: string): string | null => {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem(key);
-  },
-  setItem: (key: string, value: string): void => {
-    if (typeof window === 'undefined') return;
-    localStorage.setItem(key, value);
-  },
-  removeItem: (key: string): void => {
-    if (typeof window === 'undefined') return;
-    localStorage.removeItem(key);
-  },
-};
+import { safeLocalStorage } from '@/lib/safeLocalStorage';
 
 interface WebAuthContextType extends AuthContextType {
   getRegistrationOptions: (walletAddress: string) => any;
@@ -73,7 +58,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   };
 
-  const register = async (walletAddress: string, publicKey: string, credentialId: string): Promise<boolean> => {
+  const register = async (walletAddress: string, _publicKey: string, credentialId: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
@@ -185,13 +170,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             }
           }
         } catch {
-          // Fall back to session token
-          const sessionToken = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
-          safeLocalStorage.setItem('userToken', sessionToken);
+          // Backend unavailable — do NOT generate a fake session token.
+          // Without a valid JWT from the backend, authenticated API calls will fail.
+          // The user will need network connectivity to obtain a proper token.
+          console.warn('Backend login failed: could not obtain JWT token. API calls will fail until reconnected.');
         }
       } else {
-        const sessionToken = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
-        safeLocalStorage.setItem('userToken', sessionToken);
+        // No wallet address — cannot obtain backend token
+        console.warn('No wallet address found. Cannot obtain backend JWT token.');
       }
 
       safeLocalStorage.setItem('credentialId', credential.id);

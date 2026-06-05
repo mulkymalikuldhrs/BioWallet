@@ -98,24 +98,28 @@ export const createTransaction = async (req: Request, res: Response) => {
 
     // Listen for transaction confirmation (async)
     provider.once(tx.hash, async (receipt) => {
-      if (receipt.status === 1) {
-        // Transaction successful
-        await prisma.transaction.update({
-          where: { txHash: tx.hash },
-          data: {
-            status: 'CONFIRMED',
-            blockNumber: receipt.blockNumber,
-            blockTimestamp: new Date()
-          }
-        });
-      } else {
-        // Transaction failed
-        await prisma.transaction.update({
-          where: { txHash: tx.hash },
-          data: {
-            status: 'FAILED'
-          }
-        });
+      try {
+        if (receipt.status === 1) {
+          // Transaction successful
+          await prisma.transaction.update({
+            where: { txHash: tx.hash },
+            data: {
+              status: 'CONFIRMED',
+              blockNumber: receipt.blockNumber,
+              blockTimestamp: new Date()
+            }
+          });
+        } else {
+          // Transaction failed
+          await prisma.transaction.update({
+            where: { txHash: tx.hash },
+            data: {
+              status: 'FAILED'
+            }
+          });
+        }
+      } catch (updateErr) {
+        console.error('Error updating transaction status for hash:', tx.hash, updateErr);
       }
     });
   } catch (error) {

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 // Extend Express Request type to include user
 declare global {
@@ -152,7 +153,20 @@ export const adminAuthMiddleware = (req: Request, res: Response, next: NextFunct
       return;
     }
 
-    if (!adminApiKey || adminApiKey !== expectedAdminKey) {
+    if (!adminApiKey) {
+      res.status(403).json({ message: 'Admin access denied. API key is required.' });
+      return;
+    }
+
+    // Use timing-safe comparison to prevent timing attacks
+    try {
+      const keyBuffer = Buffer.from(adminApiKey, 'utf-8');
+      const expectedBuffer = Buffer.from(expectedAdminKey, 'utf-8');
+      if (keyBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(keyBuffer, expectedBuffer)) {
+        res.status(403).json({ message: 'Admin access denied. Invalid API key.' });
+        return;
+      }
+    } catch {
       res.status(403).json({ message: 'Admin access denied. Invalid API key.' });
       return;
     }

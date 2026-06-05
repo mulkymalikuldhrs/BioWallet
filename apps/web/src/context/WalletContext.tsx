@@ -2,22 +2,7 @@ import { createContext, useState, useContext, useEffect, useCallback, ReactNode 
 import { ethers } from 'ethers';
 import { generateWalletFromBiometric as coreGenerateWallet } from 'wallet-core';
 import type { WalletContextType } from 'utils';
-
-// SSR-safe localStorage wrapper
-const safeLocalStorage = {
-  getItem: (key: string): string | null => {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem(key);
-  },
-  setItem: (key: string, value: string): void => {
-    if (typeof window === 'undefined') return;
-    localStorage.setItem(key, value);
-  },
-  removeItem: (key: string): void => {
-    if (typeof window === 'undefined') return;
-    localStorage.removeItem(key);
-  },
-};
+import { safeLocalStorage } from '@/lib/safeLocalStorage';
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 

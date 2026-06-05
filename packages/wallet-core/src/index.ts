@@ -83,19 +83,25 @@ export async function sendTransaction(
  * @param address - The wallet address
  * @param provider - The Ethereum provider
  * @returns The transaction history
+ *
+ * WARNING: This naive implementation scans recent blocks linearly and is NOT
+ * suitable for production. Use an indexer (e.g., Etherscan API, Alchemy
+ * getAssetTransfers, or The Graph) for reliable transaction history.
  */
 export async function getTransactionHistory(
   address: string,
   provider: ethers.Provider
 ): Promise<any[]> {
   try {
+    const addressLower = address.toLowerCase();
     const blockNumber = await provider.getBlockNumber();
     
+    // Only scan the last 5 blocks (reduced from 10 to limit RPC calls)
     const blocks = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
       if (blockNumber - i < 0) break;
       const block = await provider.getBlock(blockNumber - i);
-      if (block && block.transactions) {
+      if (block && block.prefetchedTransactions) {
         blocks.push(block);
       }
     }
@@ -103,9 +109,9 @@ export async function getTransactionHistory(
     const transactions = [];
     for (const block of blocks) {
       if (!block) continue;
-      for (const txHash of block.transactions) {
+      for (const txHash of block.prefetchedTransactions || []) {
         const tx = await provider.getTransaction(txHash);
-        if (tx && (tx.from === address || tx.to === address)) {
+        if (tx && (tx.from.toLowerCase() === addressLower || tx.to?.toLowerCase() === addressLower)) {
           transactions.push(tx);
         }
       }
