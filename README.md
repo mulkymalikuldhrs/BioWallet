@@ -6,8 +6,8 @@
 
 <br/>
 
-[![Version](https://img.shields.io/badge/version-3.0.0-2E9EF7?style=for-the-badge&logo=semver)](https://github.com/mulkymalikuldhrs/BioWallet)
-[![Status](https://img.shields.io/badge/status-Production_Ready-brightgreen?style=for-the-badge)](https://github.com/mulkymalikuldhrs/BioWallet)
+[![Version](https://img.shields.io/badge/version-0.3.0--alpha-2E9EF7?style=for-the-badge&logo=semver)](https://github.com/mulkymalikuldhrs/BioWallet)
+[![Status](https://img.shields.io/badge/status-Alpha-orange?style=for-the-badge)](https://github.com/mulkymalikuldhrs/BioWallet)
 [![React Native](https://img.shields.io/badge/React_Native-Expo-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactnative.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
@@ -15,7 +15,9 @@
 
 <br/>
 
-**A revolutionary biometric crypto wallet that uses human biometrics (fingerprint, face, iris) for key derivation instead of passwords or seed phrases.**
+**A biometric crypto wallet that uses human biometrics (fingerprint, face, iris) for key derivation instead of passwords or seed phrases.**
+
+> **Status**: This project is in **Alpha** stage. Not recommended for use with real funds. Biometric key derivation is experimental.
 
 [🐛 Report Bug](https://github.com/mulkymalikuldhrs/BioWallet/issues) &bull; [✨ Request Feature](https://github.com/mulkymalikuldhrs/BioWallet/issues) &bull; [🤝 Contribute](CONTRIBUTING.md)
 
@@ -27,9 +29,9 @@
 
 ### ✨ Overview
 
-BioWallet is a revolutionary crypto wallet that uses human biometrics — fingerprint, face, and iris — for deterministic key derivation, eliminating the need for passwords or seed phrases. Built as a monorepo with React Native (mobile), Next.js (web), and Express (backend), it provides a secure, user-friendly way to manage your cryptocurrency assets with biometric authentication at its core.
+BioWallet is a biometric crypto wallet that uses human biometrics — fingerprint, face, and iris — for deterministic key derivation, eliminating the need for passwords or seed phrases. Built as a monorepo with React Native (mobile), Next.js (web), and Express (backend), it provides a secure, user-friendly way to manage your cryptocurrency assets with biometric authentication at its core.
 
-### 🔐 v3.0.0 — Production Ready
+### 🔐 v0.3.0-alpha — Security Hardening
 
 This release includes critical security fixes and production hardening:
 
@@ -205,7 +207,7 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 **Mulky Malikul Dhaher**
 
 [![GitHub](https://img.shields.io/badge/GitHub-mulkymalikuldhrs-181717?style=flat&logo=github)](https://github.com/mulkymalikuldhrs)
-[![Email](https://img.shields.io/badge/Email-mulkymalikuldhaher@email.com-EA4335?style=flat&logo=gmail&logoColor=white)](mailto:mulkymalikuldhaher@email.com)
+[![Email](https://img.shields.io/badge/Email-mulkymalikudhr@mail.com-EA4335?style=flat&logo=gmail&logoColor=white)](mailto:mulkymalikudhr@mail.com)
 
 ---
 
@@ -215,19 +217,19 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 > **⚠️ For Education Purpose Only**
 > This project is provided strictly for educational and research purposes. The authors and contributors assume **no responsibility or liability** for any damages, losses, or risks arising from the use of this software. **We do not bear any responsibility or risk** for how this software is used. Use at your own risk.
-> **Contact:** Mulky Malikul Dhaher | mulkymalikuldhaher@email.com
+> **Contact:** Mulky Malikul Dhaher | mulkymalikudhr@mail.com
 
 ### 🇮🇩 Bahasa Indonesia
 
 > **⚠️ Hanya untuk Tujuan Pendidikan**
 > Proyek ini disediakan secara ketat untuk tujuan pendidikan dan penelitian. Penulis dan kontributor **tidak bertanggung jawab atau berkewajiban** atas kerusakan, kerugian, atau risiko yang timbul dari penggunaan perangkat lunak ini. **Kami tidak menanggung tanggung jawab atau risiko** apa pun untuk penggunaan perangkat lunak ini. Gunakan dengan risiko Anda sendiri.
-> **Kontak:** Mulky Malikul Dhaher | mulkymalikuldhaher@email.com
+> **Kontak:** Mulky Malikul Dhaher | mulkymalikudhr@mail.com
 
 ### 🇨🇳 中文
 
 > **⚠️ 仅供教育目的**
 > 本项目严格仅供教育和研究目的提供。作者和贡献者对因使用本软件而产生的任何损害、损失或风险**不承担任何责任或义务**。**我们不承担任何责任或风险**对于本软件的使用方式。使用风险自负。
-> **联系方式:** Mulky Malikul Dhaher | mulkymalikuldhaher@email.com
+> **联系方式:** Mulky Malikul Dhaher | mulkymalikudhr@mail.com
 
 ---
 

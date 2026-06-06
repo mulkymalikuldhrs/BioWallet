@@ -18,7 +18,7 @@ We take the security of BioWallet seriously. If you discover a security vulnerab
 
 If you discover a security vulnerability within BioWallet, please report it by:
 
-1. **Email:** Send a detailed report to **mulkymalikuldhaher@email.com**
+1. **Email:** Send a detailed report to **mulkymalikudhr@mail.com**
 2. **Do NOT** create a public GitHub issue for security vulnerabilities
 3. Include the following in your report:
    - Type of vulnerability
@@ -55,4 +55,4 @@ We will acknowledge your report within 48 hours and provide a detailed response 
 
 This software is for educational and research purposes only. It should not be used in production environments without proper security audits. The authors assume no liability for any security issues or losses arising from the use of this software.
 
-**Contact:** Mulky Malikul Dhaher | mulkymalikuldhaher@email.com
+**Contact:** Mulky Malikul Dhaher | mulkymalikudhr@mail.com

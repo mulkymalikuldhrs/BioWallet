@@ -190,7 +190,7 @@ BioWallet 非常重视安全性：
 
 由 **Mulky Malikul Dhaher** 开发
 
-- 邮箱: mulkymalikuldhaher@email.com
+- 邮箱: mulkymalikudhr@mail.com
 - GitHub: [mulkymalikuldhrs](https://github.com/mulkymalikuldhrs)
 - 生态系统: [HermesQuantOS](https://github.com/mulkymalikuldhrs/HermesQuantOS)
 
