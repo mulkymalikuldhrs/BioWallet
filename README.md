@@ -194,6 +194,16 @@ yarn dev:backend
 | ![WebAuthn](https://img.shields.io/badge/WebAuthn-FIDO2-FF6F00) | Biometric Auth |
 | ![ethers.js](https://img.shields.io/badge/ethers.js-6-7C3AED) | Ethereum SDK |
 
+## 🔒 Security Notice
+
+- **Never commit your `.env` files or API keys to version control.**
+- Biometric key derivation is **experimental** — do not use with real funds.
+- This project is in **Alpha** — security auditing is ongoing.
+- Report vulnerabilities to [mulkymalikudhr@mail.com](mailto:mulkymalikudhr@mail.com).
+- All biometric data is processed **locally on-device**; nothing is sent to servers.
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
