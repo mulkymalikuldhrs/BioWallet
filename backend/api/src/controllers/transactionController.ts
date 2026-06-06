@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ethers } from 'ethers';
 import { Prisma } from '@prisma/client';
-import { prisma } from '../index';
+import { prisma } from '../index.js';
 
 // Provider for Ethereum testnet (Sepolia)
 const provider = new ethers.JsonRpcProvider(process.env.ETHEREUM_RPC_URL || 'https://rpc.ankr.com/eth_sepolia');
@@ -98,28 +98,24 @@ export const createTransaction = async (req: Request, res: Response) => {
 
     // Listen for transaction confirmation (async)
     provider.once(tx.hash, async (receipt) => {
-      try {
-        if (receipt.status === 1) {
-          // Transaction successful
-          await prisma.transaction.update({
-            where: { txHash: tx.hash },
-            data: {
-              status: 'CONFIRMED',
-              blockNumber: receipt.blockNumber,
-              blockTimestamp: new Date()
-            }
-          });
-        } else {
-          // Transaction failed
-          await prisma.transaction.update({
-            where: { txHash: tx.hash },
-            data: {
-              status: 'FAILED'
-            }
-          });
-        }
-      } catch (updateErr) {
-        console.error('Error updating transaction status for hash:', tx.hash, updateErr);
+      if (receipt.status === 1) {
+        // Transaction successful
+        await prisma.transaction.update({
+          where: { txHash: tx.hash },
+          data: {
+            status: 'CONFIRMED',
+            blockNumber: receipt.blockNumber,
+            blockTimestamp: new Date()
+          }
+        });
+      } else {
+        // Transaction failed
+        await prisma.transaction.update({
+          where: { txHash: tx.hash },
+          data: {
+            status: 'FAILED'
+          }
+        });
       }
     });
   } catch (error) {
