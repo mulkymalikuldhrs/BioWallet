@@ -182,8 +182,8 @@ const ProfileScreen: React.FC = () => {
     {
       icon: 'information-circle-outline' as const,
       title: 'About',
-      subtitle: 'BioWallet v3.0.0',
-      onPress: () => Alert.alert('About BioWallet', 'BioWallet v3.0.0\nA biometric crypto wallet.\nFor Education Purpose Only.'),
+      subtitle: 'BioWallet v2.0.0',
+      onPress: () => Alert.alert('About BioWallet', 'BioWallet v2.0.0\nA biometric crypto wallet.\nFor Education Purpose Only.'),
     },
   ];
 
