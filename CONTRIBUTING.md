@@ -321,7 +321,7 @@ Please open a GitHub Issue with the feature request template:
 If you discover a security vulnerability in BioWallet, please report it responsibly:
 
 - Do NOT open a public GitHub issue for security vulnerabilities
-- Email the maintainer directly at mulkymalikudhr@mail.com
+- Email the maintainer directly at mulkymalikuldhaher@email.com
 - Include a detailed description of the vulnerability
 - Provide steps to reproduce if possible
 - Allow reasonable time for a response before public disclosure
@@ -333,7 +333,7 @@ Security is a top priority for BioWallet, especially given the nature of biometr
 ## Community
 
 - **Author**: Mulky Malikul Dhaher
-- **Email**: mulkymalikudhr@mail.com
+- **Email**: mulkymalikuldhaher@email.com
 - **GitHub**: [mulkymalikuldhrs](https://github.com/mulkymalikuldhrs)
 - **Ecosystem**: [HermesQuantOS](https://github.com/mulkymalikuldhrs/HermesQuantOS)
 

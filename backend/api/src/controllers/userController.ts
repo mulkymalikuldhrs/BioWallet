@@ -80,20 +80,6 @@ export const createUser = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error creating user:', error);
-    // Handle Prisma unique constraint violations with proper HTTP status
-    if (error && typeof error === 'object' && 'code' in error) {
-      const prismaError = error as { code: string; meta?: { target?: string[] } };
-      if (prismaError.code === 'P2002') {
-        const target = prismaError.meta?.target?.[0] || 'field';
-        const fieldMap: Record<string, string> = {
-          walletAddress: 'Wallet address already registered',
-          email: 'Email address already in use',
-          deviceId: 'Device already registered',
-          referralCode: 'Referral code conflict, please try again',
-        };
-        return res.status(409).json({ message: fieldMap[target] || `Duplicate value for ${target}` });
-      }
-    }
     res.status(500).json({ message: 'Failed to create user' });
   }
 };
@@ -192,10 +178,7 @@ export const updateUser = async (req: Request, res: Response) => {
       return res.status(403).json({ message: 'Access denied: you can only update your own profile' });
     }
 
-    const updateData: Record<string, unknown> = {};
-    if (email !== undefined) updateData.email = email;
-    if (deviceId !== undefined) updateData.deviceId = deviceId;
-    updateData.lastLogin = new Date();
+    const updateData: Record<string, unknown> = { email, deviceId, lastLogin: new Date() };
     if (isPremium !== undefined) {
       // Only admins can change isPremium status
       if (!authenticatedUser?.isAdmin) {
