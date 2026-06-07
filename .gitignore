@@ -47,19 +47,10 @@ test-results/
 *.tsbuildinfo
 
 # Prisma
-backend/db/migrations/
+prisma/migrations/
 
 # Docker
 docker-compose.override.yml
-
-# Crypto/Certificate files
-*.key
-*.crt
-*.p12
-*.jks
-
-# Package lock (yarn workspace)
-package-lock.json
 
 # Misc
 *.pem

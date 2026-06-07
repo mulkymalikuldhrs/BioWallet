@@ -85,20 +85,6 @@ export const registerWallet = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error registering wallet:', error);
-    // Handle Prisma unique constraint violations with proper HTTP status
-    if (error && typeof error === 'object' && 'code' in error) {
-      const prismaError = error as { code: string; meta?: { target?: string[] } };
-      if (prismaError.code === 'P2002') {
-        const target = prismaError.meta?.target?.[0] || 'field';
-        const fieldMap: Record<string, string> = {
-          walletAddress: 'Wallet address already registered',
-          email: 'Email address already in use',
-          deviceId: 'Device already registered',
-          referralCode: 'Referral code conflict, please try again',
-        };
-        return res.status(409).json({ message: fieldMap[target] || `Duplicate value for ${target}` });
-      }
-    }
     res.status(500).json({ message: 'Failed to register wallet' });
   }
 };
