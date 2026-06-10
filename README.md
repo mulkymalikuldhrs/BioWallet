@@ -81,6 +81,16 @@ This is an early-stage research project investigating whether biometric auth can
 
 ```bash
 # Clone the repository
+
+<!-- AUTO-PACKAGE-BADGES:START -->
+<!-- Auto-generated package badges -->
+
+![npm version](https://img.shields.io/npm/v/biometric-core?style=flat-square&logo=npm&color=blue) ![npm downloads](https://img.shields.io/npm/dw/biometric-core?style=flat-square&color=brightgreen) ![npm license](https://img.shields.io/npm/l/biometric-core?style=flat-square) [![Deployed](https://img.shields.io/badge/deployed-2.0.0-blue?style=flat-square)](https://www.npmjs.com/package/biometric-core)
+![npm version](https://img.shields.io/npm/v/shared-ui?style=flat-square&logo=npm&color=blue) ![npm downloads](https://img.shields.io/npm/dw/shared-ui?style=flat-square&color=brightgreen) ![npm license](https://img.shields.io/npm/l/shared-ui?style=flat-square) [![Deployed](https://img.shields.io/badge/deployed-2.0.0-blue?style=flat-square)](https://www.npmjs.com/package/shared-ui)
+![npm version](https://img.shields.io/npm/v/utils?style=flat-square&logo=npm&color=blue) ![npm downloads](https://img.shields.io/npm/dw/utils?style=flat-square&color=brightgreen) ![npm license](https://img.shields.io/npm/l/utils?style=flat-square) [![Deployed](https://img.shields.io/badge/deployed-2.0.0-blue?style=flat-square)](https://www.npmjs.com/package/utils)
+![npm version](https://img.shields.io/npm/v/wallet-core?style=flat-square&logo=npm&color=blue) ![npm downloads](https://img.shields.io/npm/dw/wallet-core?style=flat-square&color=brightgreen) ![npm license](https://img.shields.io/npm/l/wallet-core?style=flat-square) [![Deployed](https://img.shields.io/badge/deployed-2.0.0-blue?style=flat-square)](https://www.npmjs.com/package/wallet-core)
+
+<!-- AUTO-PACKAGE-BADGES:END -->
 git clone https://github.com/mulkymalikuldhrs/BioWallet.git
 cd BioWallet
 
