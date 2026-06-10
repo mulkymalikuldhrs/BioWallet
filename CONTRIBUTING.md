@@ -1,344 +1,133 @@
-# Contributing to BioWallet
+# Contributing to Our Projects
 
-Thank you for your interest in contributing to BioWallet! This document provides guidelines and instructions for contributing to the project. We appreciate all forms of contribution, from code and documentation to bug reports and feature suggestions.
+First off, **thank you** for considering contributing! Every contribution matters — whether it's fixing a typo, adding a feature, improving docs, or just reporting a bug.
 
----
+## Quick Start for New Contributors
 
-## Table of Contents
+### 🟢 Easy Ways to Contribute (No Experience Required)
 
-- [Code of Conduct](#code-of-conduct)
-- [How Can I Contribute?](#how-can-i-contribute)
-- [Development Setup](#development-setup)
-- [Monorepo Structure](#monorepo-structure)
-- [Coding Standards](#coding-standards)
-- [Commit Guidelines](#commit-guidelines)
-- [Pull Request Process](#pull-request-process)
-- [Reporting Bugs](#reporting-bugs)
-- [Suggesting Features](#suggesting-features)
-- [Security Vulnerabilities](#security-vulnerabilities)
-- [Community](#community)
+| Area | How | Time |
+|------|-----|------|
+| **Fix a typo** | Find and fix typos in README, docs, or comments | 5 min |
+| **Improve documentation** | Add missing docs, clarify confusing sections | 15 min |
+| **Report a bug** | Found something broken? Open an issue! | 10 min |
+| **Suggest a feature** | Have an idea? We want to hear it | 10 min |
+| **Add tests** | Write tests for uncovered code | 30 min |
+| **Translate** | Help translate docs to your language | 30 min |
+| **Add code comments** | Make code easier to understand | 15 min |
+| **Fix a good-first-issue** | Look for issues tagged `good first issue` | 1 hour |
 
----
+### How to Submit Your First Contribution
 
-## Code of Conduct
+1. **Fork** the repository
+2. **Clone** your fork locally
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/REPO_NAME.git
+   cd REPO_NAME
+   ```
+3. **Create a branch** for your changes
+   ```bash
+   git checkout -b fix/my-first-contribution
+   ```
+4. **Make your changes** and test them
+5. **Commit** with a clear message
+   ```bash
+   git commit -m "fix: correct typo in README"
+   ```
+6. **Push** to your fork
+   ```bash
+   git push origin fix/my-first-contribution
+   ```
+7. **Open a Pull Request** — describe what you changed and why
 
-By participating in this project, you agree to maintain a respectful, inclusive, and professional environment. Harassment, discrimination, and disruptive behavior will not be tolerated. We are committed to providing a welcoming experience for everyone.
-
----
-
-## How Can I Contribute?
-
-### Reporting Bugs
-
-When filing a bug report, please include the following information:
-
-- A clear and descriptive title summarizing the issue
-- The component affected (mobile app, web app, backend API, shared packages)
-- Steps to reproduce the problem
-- Expected behavior versus actual behavior
-- Screenshots or error logs if available
-- Your environment details (OS, Node.js version, device model for mobile)
-
-### Suggesting Features
-
-Feature suggestions are welcome. Please provide:
-
-- A clear description of the proposed feature
-- The use case or problem it solves
-- Any relevant examples from existing wallets or applications
-- Mockups or design ideas if applicable
-- Which platform(s) the feature should target (mobile, web, backend)
-
-### Contributing Code
-
-We accept pull requests for bug fixes, new features, and improvements. Please follow the development setup and coding standards outlined below.
-
-### Improving Documentation
-
-Documentation contributions are always appreciated, whether fixing typos, adding examples, improving clarity, or translating content into additional languages.
-
----
+That's it! We'll review your PR and help you get it merged.
 
 ## Development Setup
 
-### Prerequisites
-
-- Node.js 14+ (recommended: 18+)
-- Yarn (required for monorepo workspace management)
-- Docker and Docker Compose
-- Git
-- For mobile development: Expo CLI, Android Studio or Xcode
-- For web development: A modern browser with WebAuthn support
-
-### Local Setup
-
-1. Fork the repository on GitHub.
-2. Clone your fork locally:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/BioWallet.git
-   cd BioWallet
-   ```
-3. Add the upstream remote:
-   ```bash
-   git remote add upstream https://github.com/mulkymalikuldhrs/BioWallet.git
-   ```
-4. Install dependencies:
-   ```bash
-   yarn install
-   ```
-5. Start the development infrastructure:
-   ```bash
-   yarn docker:up
-   yarn prisma:generate
-   yarn prisma:migrate
-   ```
-6. Start the application you want to work on:
-   ```bash
-   # Backend API
-   yarn dev:backend
-
-   # Web App
-   yarn dev:web
-
-   # Mobile App
-   yarn dev:mobile
-   ```
-
-### Database Management
-
+### For TypeScript/Next.js Projects
 ```bash
-# Generate Prisma client
-yarn prisma:generate
-
-# Run database migrations
-yarn prisma:migrate
-
-# Open Prisma Studio (database GUI)
-yarn prisma:studio
+npm install
+cp .env.example .env
+npm run dev
 ```
 
----
-
-## Monorepo Structure
-
-BioWallet uses Yarn workspaces for monorepo management. Understanding the structure is essential for effective contributions:
-
-```
-BioWallet/
-├── apps/
-│   ├── mobile/          # React Native + Expo app
-│   │   ├── App.tsx
-│   │   ├── src/
-│   │   │   ├── context/  # AuthContext, WalletContext, ThemeContext
-│   │   │   ├── screens/  # HomeScreen, RegisterScreen, WelcomeScreen
-│   │   │   └── navigation/ # MainNavigator
-│   │   └── package.json
-│   └── web/             # Next.js + WebAuthn app
-│       ├── src/
-│       │   ├── pages/    # index, register
-│       │   └── context/  # AuthContext, WalletContext
-│       └── package.json
-├── packages/
-│   ├── wallet-core/     # Ethereum wallet functionality
-│   ├── biometric-core/  # Biometric processing logic
-│   ├── shared-ui/       # Shared UI components
-│   └── utils/           # Shared utilities
-├── backend/
-│   ├── api/             # Express API server
-│   │   ├── src/
-│   │   │   ├── routes/    # userRoutes, walletRoutes, transactionRoutes, adminRoutes
-│   │   │   └── controllers/ # userController, walletController, transactionController, adminController
-│   │   └── package.json
-│   └── db/              # Prisma schema and migrations
-│       └── schema.prisma
-├── docker-compose.yml   # PostgreSQL and development services
-├── package.json         # Root workspace configuration
-└── docs/                # Architecture and design documentation
-```
-
-### Workspace Commands
-
-When working in the monorepo, use workspace-aware commands:
-
+### For Python Projects
 ```bash
-# Run a command in a specific workspace
-yarn workspace mobile start
-yarn workspace web dev
-yarn workspace api dev
-
-# Add a dependency to a specific workspace
-yarn workspace mobile add <package>
-yarn workspace api add <package>
-
-# Add a shared dependency to the root
-yarn add -W <package>
+pip install -r requirements.txt
+cp .env.example .env
+python app.py
 ```
 
----
-
-## Coding Standards
-
-### TypeScript
-
-- Use TypeScript for all new code across all workspaces.
-- Avoid `any` types; define proper interfaces and types.
-- Use strict TypeScript configuration.
-- Export types and interfaces from dedicated files for reuse.
-
-### React / React Native
-
-- Use functional components with hooks.
-- Manage state with Context API (AuthContext, WalletContext, ThemeContext).
-- Follow consistent component structure: imports, types, component, exports.
-- Ensure cross-platform compatibility when working on shared components.
-
-### Backend
-
-- Follow Express.js best practices for route and controller organization.
-- Use Prisma for all database interactions; avoid raw SQL queries.
-- Validate all inputs with appropriate validation middleware.
-- Return consistent API response formats.
-- Include proper error handling and status codes.
-
-### Security
-
-Since BioWallet handles financial and biometric data, security is paramount:
-
-- Never log or expose sensitive data (private keys, biometric data, passwords).
-- All biometric processing must occur locally on the device.
-- Use environment variables for all configuration secrets.
-- Follow OWASP best practices for API security.
-- Review changes for potential security implications before submitting.
-
-### File Naming
-
-- Use kebab-case for file names: `wallet-routes.ts`
-- Use PascalCase for React component files: `HomeScreen.tsx`
-- Use camelCase for utility functions: `formatBalance.ts`
-
----
-
-## Commit Guidelines
-
-We follow conventional commit messages:
-
-```
-type(scope): description
-
-[optional body]
-
-[optional footer]
+### For Kotlin/Android Projects
+```bash
+# Open in Android Studio
+./gradlew assembleDebug
 ```
 
-### Types
+## Code Style Guidelines
 
-- `feat`: A new feature
-- `fix`: A bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `test`: Adding or updating tests
-- `chore`: Build, tooling, or dependency changes
-
-### Scope Examples
-
-- `feat(mobile)`: Feature for the mobile app
-- `fix(api)`: Bug fix in the backend API
-- `feat(wallet-core)`: Feature in the wallet-core package
-- `docs(readme)`: Documentation change
-
-### Examples
-
-```
-feat(mobile): add iris scanning support for biometric authentication
-fix(api): resolve transaction history pagination issue
-feat(wallet-core): implement ERC-20 token balance checking
-docs(architecture): update data flow diagrams
-```
-
----
+- **TypeScript**: Follow the existing ESLint configuration
+- **Python**: Follow PEP 8, use type hints where possible
+- **Kotlin**: Follow Kotlin coding conventions
+- **Commits**: Use [Conventional Commits](https://www.conventionalcommits.org/)
+  - `feat:` new feature
+  - `fix:` bug fix
+  - `docs:` documentation only
+  - `style:` formatting, no code change
+  - `refactor:` code restructuring
+  - `test:` adding tests
+  - `chore:` maintenance
 
 ## Pull Request Process
 
-1. Create a new branch from `main`:
-   ```bash
-   git checkout -b feat/your-feature-name
-   ```
-2. Make your changes following the coding standards.
-3. Test your changes thoroughly:
-   - For mobile: test on both iOS and Android simulators
-   - For web: test in multiple browsers with WebAuthn support
-   - For backend: test all API endpoints
-4. Commit your changes following the commit guidelines.
-5. Push your branch:
-   ```bash
-   git push origin feat/your-feature-name
-   ```
-6. Open a Pull Request against the `main` branch.
-7. Include a clear description of the changes and reference any related issues.
-8. Be responsive to code review feedback.
-
-### PR Requirements
-
-- All existing tests must pass
-- New features must include corresponding tests
-- No TypeScript errors
-- No linting errors
-- Security-sensitive changes must be clearly documented
-- Changes to shared packages must not break dependent workspaces
-
----
+1. Update documentation if your change affects behavior
+2. Add tests for new functionality
+3. Ensure all existing tests pass
+4. Keep PRs focused — one feature/fix per PR
+5. Be patient — we'll review as soon as possible
 
 ## Reporting Bugs
 
-Please open a GitHub Issue with:
+When filing a bug report, please include:
 
-1. **Title**: Concise description of the bug
-2. **Component**: Which part of the system is affected (mobile/web/backend/package)
-3. **Description**: Detailed explanation of the issue
-4. **Reproduction Steps**: Numbered steps to reproduce
-5. **Expected Behavior**: What should happen
-6. **Actual Behavior**: What actually happens
-7. **Environment**: OS, Node.js version, device/browser details
-8. **Screenshots/Logs**: If applicable
-
----
+1. **What happened** — describe the unexpected behavior
+2. **What you expected** — what should have happened
+3. **Steps to reproduce** — how can we see the bug?
+4. **Environment** — OS, Node.js/Python version, browser
+5. **Screenshots/logs** — if applicable
 
 ## Suggesting Features
 
-Please open a GitHub Issue with the feature request template:
+We love feature suggestions! Please include:
 
-1. **Problem**: What problem does this feature solve?
-2. **Proposed Solution**: How should it work?
-3. **Platform**: Which platform(s) should this target?
-4. **Alternatives**: Any alternative approaches considered
-5. **Additional Context**: Examples, mockups, or references
+1. **The problem** — what are you trying to solve?
+2. **The solution** — how would you like it to work?
+3. **Alternatives** — other approaches you've considered
+4. **Additional context** — screenshots, examples, links
 
----
+## Community Guidelines
 
-## Security Vulnerabilities
+- Be respectful and constructive
+- Help others learn and grow
+- Celebrate all contributions, no matter how small
+- Ask questions — there are no dumb questions
+- Follow our [Code of Conduct](CODE_OF_CONDUCT.md)
 
-If you discover a security vulnerability in BioWallet, please report it responsibly:
+## Recognition
 
-- Do NOT open a public GitHub issue for security vulnerabilities
-- Email the maintainer directly at mulkymalikudhr@mail.com
-- Include a detailed description of the vulnerability
-- Provide steps to reproduce if possible
-- Allow reasonable time for a response before public disclosure
+All contributors are valued! We recognize contributions through:
 
-Security is a top priority for BioWallet, especially given the nature of biometric data and cryptocurrency handling. We take all security reports seriously and will respond promptly.
+- Listing in the repository's contributor list
+- Shoutouts in release notes
+- The satisfaction of building something together
 
----
+## Questions?
 
-## Community
-
-- **Author**: Mulky Malikul Dhaher
-- **Email**: mulkymalikudhr@mail.com
-- **GitHub**: [mulkymalikuldhrs](https://github.com/mulkymalikuldhrs)
-- **Ecosystem**: [HermesQuantOS](https://github.com/mulkymalikuldhrs/HermesQuantOS)
-
-Thank you for contributing to BioWallet! Your efforts help make cryptocurrency management more secure and accessible through biometric innovation.
+Feel free to:
+- Open a [GitHub Issue](../../issues)
+- Start a [GitHub Discussion](../../discussions)
+- Email: mulkymalikudhr@mail.com
 
 ---
 
-**⚠️ For Education Purpose Only** — This project is provided strictly for educational and research purposes. The authors and contributors assume **no responsibility or liability** for any damages, losses, or risks arising from the use of this software. **We do not bear any responsibility or risk** for how this software is used.
+**Remember: Every expert was once a beginner. Your first contribution is always the hardest — we're here to help!**
