@@ -1,9 +1,9 @@
 import express from 'express';
-import { registerWallet, getWalletBalance, getWalletTransactions } from '../controllers/walletController';
-import { authMiddleware } from '../middleware/auth';
-import { strictRateLimiter, authRateLimiter } from '../middleware/rateLimiter';
-import { validateBody } from '../validators/middleware';
-import { registerWalletSchema } from '../validators/schemas';
+import { registerWallet, getWalletBalance, getWalletTransactions } from '../controllers/walletController.js';
+import { authMiddleware } from '../middleware/auth.js';
+import { strictRateLimiter, authRateLimiter } from '../middleware/rateLimiter.js';
+import { validateBody } from '../validators/middleware.js';
+import { registerWalletSchema } from '../validators/schemas.js';
 
 const router = express.Router();
 
