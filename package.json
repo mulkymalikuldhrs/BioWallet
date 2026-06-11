@@ -33,6 +33,6 @@
     "@prisma/client": "6.19.3",
     "playwright": "^1.59.1",
     "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "react-dom": "19.2.7"
   }
 }
