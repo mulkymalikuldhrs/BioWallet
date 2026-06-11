@@ -1,4 +1,3 @@
-<img src="docs/banner.png" width="100%">
 
 <img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0:0a1628,50:0d2b4a,100:143d5e&fontColor=38bdf8&descColor=22d3ee&height=220&section=header&text=BioWallet&fontSize=70&desc=Biometric%20Crypto%20Wallet%20Concept&animation=fadeIn" />
 
