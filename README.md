@@ -159,6 +159,154 @@ BioWallet/
                                           └───────────────┘
 ```
 
+## Visual Architecture
+
+### Biometric Authentication Flow
+
+```mermaid
+flowchart TD
+    subgraph User["👤 User Interaction"]
+        A[Fingerprint / Face Scan] --> B[Hardware Security Key]
+        A --> C[Device Biometric Sensor]
+    end
+
+    subgraph WebAuthn["🔐 WebAuthn / FIDO2 Layer"]
+        D[Registration Request] --> E[Credential Creation]
+        F[Authentication Request] --> G[Assertion Verification]
+        E --> H[Challenge-Response Protocol]
+        G --> H
+    end
+
+    subgraph Enclave["🛡️ Secure Enclave"]
+        H --> I[Biometric Template Storage]
+        I --> J[Private Key Generation]
+        J --> K[Key Wrapping & Isolation]
+        K --> L[Key Never Leaves Device]
+    end
+
+    subgraph Derived["🔑 Derived Access"]
+        L --> M[Session Token]
+        L --> N[Transaction Signing Key]
+        L --> O[Recovery Shard]
+    end
+
+    C --> D
+    C --> F
+    B --> D
+    B --> F
+
+    style User fill:#0d2b4a,stroke:#38bdf8,color:#e0f2fe
+    style WebAuthn fill:#143d5e,stroke:#22d3ee,color:#e0f2fe
+    style Enclave fill:#0a1628,stroke:#38bdf8,color:#e0f2fe
+    style Derived fill:#1e3a5f,stroke:#22d3ee,color:#e0f2fe
+```
+
+### Wallet Transaction Pipeline
+
+```mermaid
+flowchart LR
+    subgraph Initiate["1️⃣ Initiate"]
+        A[User Requests Transaction] --> B[Biometric Re-Authentication]
+        B --> C{Auth Verified?}
+        C -->|No| D[❌ Transaction Rejected]
+    end
+
+    subgraph Sign["2️⃣ Sign"]
+        C -->|Yes| E[Construct Transaction]
+        E --> F[Retrieve Key from Enclave]
+        F --> G[Sign Transaction Hash]
+        G --> H[Generate Signature Proof]
+    end
+
+    subgraph Broadcast["3️⃣ Broadcast"]
+        H --> I[Submit to Mempool]
+        I --> J[Network Validation]
+        J --> K{Valid?}
+        K -->|No| L[❌ Rejected by Network]
+        K -->|Yes| M[✅ Transaction Confirmed]
+        M --> N[Update Wallet State]
+    end
+
+    style Initiate fill:#0d2b4a,stroke:#38bdf8,color:#e0f2fe
+    style Sign fill:#143d5e,stroke:#22d3ee,color:#e0f2fe
+    style Broadcast fill:#0a1628,stroke:#38bdf8,color:#e0f2fe
+```
+
+### Monorepo Architecture
+
+```mermaid
+graph TB
+    subgraph Turborepo["📦 BioWallet Monorepo"]
+        subgraph Apps["🖥️ Applications"]
+            Mobile["📱 Mobile App<br/>React Native<br/>Expo"]
+            Web["🌐 Web App<br/>Next.js<br/>Tailwind CSS"]
+        end
+
+        subgraph Backend["⚙️ Backend Services"]
+            API["🚀 API Server<br/>Express / Fastify<br/>Prisma ORM"]
+            DB["🗄️ Database<br/>PostgreSQL<br/>Prisma Schema"]
+        end
+
+        subgraph Packages["📚 Shared Packages"]
+            BioCore["biometric-core<br/>WebAuthn Registration<br/>& Auth Logic"]
+            WalletCore["wallet-core<br/>Key Management<br/>Transaction Signing"]
+            SharedUI["shared-ui<br/>React Components<br/>Design System"]
+            Utils["utils<br/>Shared Types<br/>Helpers"]
+        end
+    end
+
+    Mobile --> BioCore
+    Mobile --> WalletCore
+    Mobile --> SharedUI
+    Mobile --> Utils
+
+    Web --> BioCore
+    Web --> WalletCore
+    Web --> SharedUI
+    Web --> Utils
+
+    API --> BioCore
+    API --> WalletCore
+    API --> Utils
+    API --> DB
+
+    WalletCore --> BioCore
+
+    style Turborepo fill:#0a1628,stroke:#38bdf8,color:#e0f2fe
+    style Apps fill:#0d2b4a,stroke:#22d3ee,color:#e0f2fe
+    style Backend fill:#143d5e,stroke:#38bdf8,color:#e0f2fe
+    style Packages fill:#1e3a5f,stroke:#22d3ee,color:#e0f2fe
+```
+
+### Project Status Dashboard
+
+```mermaid
+graph LR
+    subgraph Status["⚠️ Project Status — RESEARCH PHASE"]
+        direction TB
+        A["🧪 Biometric Auth Flow"] --> A1["Research & Prototyping"]
+        B["💰 Wallet Transactions"] --> B1["Concept Only"]
+        C["📱 Mobile App"] --> C1["Early UI Shells"]
+        D["🌐 Web App"] --> D1["Early UI Shells"]
+        E["⚙️ Backend API"] --> E1["Route Scaffolding"]
+        F["🔐 Security Audit"] --> F1["NOT PERFORMED"]
+        G["📦 npm Packages"] --> G1["Published — Core Logic Only"]
+    end
+
+    style Status fill:#0a1628,stroke:#ef4444,color:#fecaca
+    style A1 fill:#7c2d12,stroke:#f97316,color:#fed7aa
+    style B1 fill:#7c2d12,stroke:#f97316,color:#fed7aa
+    style C1 fill:#7c2d12,stroke:#f97316,color:#fed7aa
+    style D1 fill:#7c2d12,stroke:#f97316,color:#fed7aa
+    style E1 fill:#7c2d12,stroke:#f97316,color:#fed7aa
+    style F1 fill:#7f1d1d,stroke:#ef4444,color:#fecaca
+    style G1 fill:#14532d,stroke:#22c55e,color:#bbf7d0
+```
+
+> **Honest Assessment:** BioWallet is an early-stage research project. The npm packages contain scaffolding and type definitions, not battle-tested crypto implementations. The biometric auth flows are conceptual and have not been validated by security professionals. **Do not use with real funds.**
+
+---
+
 ## Contributing
 
 Contributions are especially welcome in:
