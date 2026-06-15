@@ -1,3 +1,4 @@
+import { safeLocalStorage } from '../lib/safeLocalStorage';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/AuthContext';
@@ -6,7 +7,8 @@ import { FiLoader } from 'react-icons/fi';
 import { ethers } from 'ethers';
 import { MdFingerprint } from 'react-icons/md';
 import { extractEntropy } from 'utils';
-import { safeLocalStorage } from '@/lib/safeLocalStorage';
+
+// SSR-safe localStorage wrapper
 
 export default function Register() {
   const router = useRouter();
