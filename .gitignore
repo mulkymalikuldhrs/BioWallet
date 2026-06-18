@@ -49,17 +49,14 @@ test-results/
 # Prisma
 backend/db/migrations/
 
-# Docker
-docker-compose.override.yml
-
-# Crypto/Certificate files
+# Security
 *.key
 *.crt
 *.p12
 *.jks
 
-# Package lock (yarn workspace)
-package-lock.json
+# Docker
+docker-compose.override.yml
 
 # Misc
 *.pem

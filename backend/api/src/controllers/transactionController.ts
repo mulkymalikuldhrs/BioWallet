@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ethers } from 'ethers';
 import { Prisma } from '@prisma/client';
-import { prisma } from '../index';
+import { prisma } from '../index.js';
 
 // Provider for Ethereum testnet (Sepolia)
 const provider = new ethers.JsonRpcProvider(process.env.ETHEREUM_RPC_URL || 'https://rpc.ankr.com/eth_sepolia');
@@ -118,8 +118,8 @@ export const createTransaction = async (req: Request, res: Response) => {
             }
           });
         }
-      } catch (updateErr) {
-        console.error('Error updating transaction status for hash:', tx.hash, updateErr);
+      } catch (dbError) {
+        console.error(`Error updating transaction status for ${tx.hash}:`, dbError);
       }
     });
   } catch (error) {
