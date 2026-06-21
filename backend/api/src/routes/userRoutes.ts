@@ -1,9 +1,9 @@
 import express from 'express';
-import { createUser, getUserById, updateUser, getAllUsers, getMe } from '../controllers/userController';
-import { authMiddleware, adminAuthMiddleware } from '../middleware/auth';
-import { strictRateLimiter, authRateLimiter } from '../middleware/rateLimiter';
-import { validateBody } from '../validators/middleware';
-import { createUserSchema, updateUserSchema } from '../validators/schemas';
+import { createUser, getUserById, updateUser, getAllUsers, getMe } from '../controllers/userController.js';
+import { authMiddleware, adminAuthMiddleware } from '../middleware/auth.js';
+import { strictRateLimiter, authRateLimiter } from '../middleware/rateLimiter.js';
+import { validateBody } from '../validators/middleware.js';
+import { createUserSchema, updateUserSchema } from '../validators/schemas.js';
 
 const router = express.Router();
 
