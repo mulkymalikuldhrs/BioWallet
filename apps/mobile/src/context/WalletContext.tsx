@@ -78,10 +78,9 @@ async function getOrCreateSalt(walletAddress?: string): Promise<string> {
     return storedSalt;
   }
 
-  // Create a per-user salt based on wallet address prefix (or random if no address yet)
-  // NOTE: Using ethers.randomBytes instead of Date.now() for determinism across reinstalls.
-  // The random salt is stored in SecureStore and persists across app restarts.
-  const saltSuffix = walletAddress ? walletAddress.slice(0, 8) : ethers.hexlify(ethers.randomBytes(4)).slice(2);
+  // Create a per-user salt using cryptographically secure random bytes
+  const randomBytes = ethers.randomBytes(16);
+  const saltSuffix = ethers.hexlify(randomBytes).slice(2, 10);
   const salt = `biowallet-salt-${saltSuffix}`;
   await SecureStore.setItemAsync('biowallet_salt', salt);
   return salt;
