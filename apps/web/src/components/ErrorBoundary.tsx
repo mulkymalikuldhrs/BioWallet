@@ -122,10 +122,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                   wordBreak: 'break-word',
                   overflow: 'auto',
                 }}>
-                  {process.env.NODE_ENV === 'development'
-                    ? `${this.state.error.toString()}\n${this.state.errorInfo?.componentStack || ''}`
-                    : this.state.error.message || 'An unexpected error occurred'
-                  }
+                  {this.state.error.toString()}
+                  {this.state.errorInfo && this.state.errorInfo.componentStack}
                 </pre>
               </details>
             )}

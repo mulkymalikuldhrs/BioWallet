@@ -1,6 +1,6 @@
 {
   "name": "wallet-core",
-  "version": "2.0.0",
+  "version": "3.1.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -8,9 +8,10 @@
     "dev": "tsc -w"
   },
   "dependencies": {
-    "ethers": "^6.16.0"
+    "ethers": "6.16.0"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "@types/jest": "30.0.0",
+    "typescript": "6.0.3"
   }
 }
