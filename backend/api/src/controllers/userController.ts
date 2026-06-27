@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import crypto from 'crypto';
-import { prisma } from '../index';
+import { prisma } from '../index.js';
 import { BiometricType, Prisma } from '@prisma/client';
-import { generateToken } from '../middleware/auth';
+import { generateToken } from '../middleware/auth.js';
 
 /**
  * Increment AdminStats.totalUsers for today's date.
@@ -192,10 +192,7 @@ export const updateUser = async (req: Request, res: Response) => {
       return res.status(403).json({ message: 'Access denied: you can only update your own profile' });
     }
 
-    const updateData: Record<string, unknown> = {};
-    if (email !== undefined) updateData.email = email;
-    if (deviceId !== undefined) updateData.deviceId = deviceId;
-    updateData.lastLogin = new Date();
+    const updateData: Record<string, unknown> = { email, deviceId, lastLogin: new Date() };
     if (isPremium !== undefined) {
       // Only admins can change isPremium status
       if (!authenticatedUser?.isAdmin) {
