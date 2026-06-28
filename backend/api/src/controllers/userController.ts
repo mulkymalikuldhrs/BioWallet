@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import crypto from 'crypto';
-import { prisma } from '../index';
+import { prisma } from '../index.js';
 import { BiometricType, Prisma } from '@prisma/client';
-import { generateToken } from '../middleware/auth';
+import { generateToken } from '../middleware/auth.js';
 
 /**
  * Increment AdminStats.totalUsers for today's date.
