@@ -1,9 +1,9 @@
 import express from 'express';
-import { getStats, getDailyStats, getUserGrowth, getTransactionVolume } from '../controllers/adminController';
-import { adminAuthMiddleware } from '../middleware/auth';
-import { adminRateLimiter } from '../middleware/rateLimiter';
-import { validateQuery } from '../validators/middleware';
-import { dailyStatsQuerySchema, periodQuerySchema } from '../validators/schemas';
+import { getStats, getDailyStats, getUserGrowth, getTransactionVolume } from '../controllers/adminController.js';
+import { adminAuthMiddleware } from '../middleware/auth.js';
+import { adminRateLimiter } from '../middleware/rateLimiter.js';
+import { validateQuery } from '../validators/middleware.js';
+import { dailyStatsQuerySchema, periodQuerySchema } from '../validators/schemas.js';
 
 const router = express.Router();
 
