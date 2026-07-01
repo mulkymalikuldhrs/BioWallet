@@ -1,6 +1,6 @@
 {
   "name": "mobile",
-  "version": "2.0.0",
+  "version": "3.1.0",
   "main": "index.js",
   "scripts": {
     "start": "expo start",
@@ -31,13 +31,13 @@
     "react-native-screens": "~3.20.0",
     "react-native-svg": "13.4.0",
     "shared-ui": "*",
-    "uuid": "^9.0.0",
     "utils": "*",
+    "uuid": "^9.0.0",
     "wallet-core": "*"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@types/react": "~18.0.0",
+    "@types/react": "~18.2.0",
     "@types/react-native": "~0.71.0",
     "@types/uuid": "^9.0.0",
     "typescript": "^5.0.0"
