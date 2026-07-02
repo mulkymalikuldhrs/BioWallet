@@ -1,6 +1,6 @@
 {
   "name": "bio-wallet",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -22,17 +22,17 @@
   },
   "packageManager": "yarn@1.22.22",
   "devDependencies": {
-    "@playwright/test": "^1.60.0",
-    "@types/jest": "^30.0.0",
+    "@playwright/test": "1.60.0",
+    "@types/jest": "30.0.0",
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6",
-    "turbo": "^2.0.0",
-    "typescript": "^5.7.3"
+    "turbo": "2.9.16",
+    "typescript": "6.0.3"
   },
   "dependencies": {
     "@prisma/client": "6.19.3",
-    "playwright": "^1.59.1",
-    "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "playwright": "1.60.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
   }
 }
