@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
-import { prisma } from '../index';
+import { prisma } from '../index.js';
 
 // Get overall stats
 export const getStats = async (req: Request, res: Response) => {
