@@ -1,10 +1,12 @@
+import { safeLocalStorage } from '../lib/safeLocalStorage';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/AuthContext';
 import { useWallet } from '@/context/WalletContext';
 import { extractEntropy } from 'utils';
 import { ethers } from 'ethers';
-import { safeLocalStorage } from '@/lib/safeLocalStorage';
+
+// SSR-safe localStorage wrapper
 
 export default function Dashboard() {
   const router = useRouter();
