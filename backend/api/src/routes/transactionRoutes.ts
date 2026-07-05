@@ -1,9 +1,9 @@
 import express from 'express';
-import { createTransaction, getTransactionById, getAllTransactions } from '../controllers/transactionController';
-import { authMiddleware } from '../middleware/auth';
-import { strictRateLimiter, transactionRateLimiter } from '../middleware/rateLimiter';
-import { validateBody, validateQuery } from '../validators/middleware';
-import { createTransactionSchema, transactionListQuerySchema } from '../validators/schemas';
+import { createTransaction, getTransactionById, getAllTransactions } from '../controllers/transactionController.js';
+import { authMiddleware } from '../middleware/auth.js';
+import { strictRateLimiter, transactionRateLimiter } from '../middleware/rateLimiter.js';
+import { validateBody, validateQuery } from '../validators/middleware.js';
+import { createTransactionSchema, transactionListQuerySchema } from '../validators/schemas.js';
 
 const router = express.Router();
 
