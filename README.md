@@ -219,17 +219,39 @@ graph LR
 ## Quick Start
 
 ### Prerequisites
-- Node.js 18+
+- **Node.js 18+** (tested on 22)
+- **Yarn 1 (Classic)** — this repo is a Yarn workspaces monorepo, not npm
+- **Docker + Docker Compose** — used to run the PostgreSQL database
 - A browser/device that supports WebAuthn
 - Biometric sensor or hardware security key
 
 ### Installation
 
+BioWallet is a **Yarn workspaces + [Turborepo](https://turbo.build/) monorepo** and uses **Yarn 1 (Classic)** — not npm.
+
 ```bash
 git clone https://github.com/mulkymalikuldhrs/BioWallet.git
 cd BioWallet
 
-# Install dependencies
+# 1. Install dependencies (a single root install wires up every workspace)
+yarn install
+
+# 2. Copy the environment templates, then edit the CHANGE_ME_* values
+cp .env.example .env
+cp backend/api/.env.example backend/api/.env
+cp apps/web/.env.example apps/web/.env.local
+# Keep POSTGRES_PASSWORD (in .env) in sync with the password inside
+# backend/api/.env DATABASE_URL, or the API cannot connect to Postgres.
+
+# 3. Start PostgreSQL (Docker)
+yarn docker:up            # or: docker compose up -d postgres
+
+# 4. Generate the Prisma client and apply database migrations
+yarn prisma:generate
+yarn prisma:migrate
+```
+
+#### Published packages
 
 <!-- AUTO-PACKAGE-BADGES:START -->
 <!-- Auto-generated package badges -->
@@ -240,48 +262,65 @@ cd BioWallet
 ![npm version](https://img.shields.io/npm/v/wallet-core?style=flat-square&logo=npm&color=blue) ![npm downloads](https://img.shields.io/npm/dw/wallet-core?style=flat-square&color=brightgreen) ![npm license](https://img.shields.io/npm/l/wallet-core?style=flat-square) [![Deployed](https://img.shields.io/badge/deployed-2.0.0-blue?style=flat-square)](https://www.npmjs.com/package/wallet-core)
 
 <!-- AUTO-PACKAGE-BADGES:END -->
-npm install
-
-# Configure environment
-cp .env.example .env
-```
 
 ### Configuration
 
-```env
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-DATABASE_URL=your_database_url
-WEBAUTHN_RP_ID=localhost
-WEBAUTHN_RP_NAME=BioWallet
+Configuration is split across three env files, each with a committed `*.example` template:
+
+| File | Used by | Key variables |
+|------|---------|---------------|
+| `.env` | `docker-compose` | `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `DATABASE_URL`, `JWT_SECRET`, `ETHEREUM_RPC_URL` |
+| `backend/api/.env` | API server | `PORT`, `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGIN`, `ADMIN_API_KEY`, `ETHEREUM_RPC_URL`, `ETHEREUM_NETWORK` |
+| `apps/web/.env.local` | Web app | `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_RPC_URL` |
+
+Both `.env` and `backend/api/.env` contain a `DATABASE_URL`, and they must point at the same database. The canonical format is:
+
+```text
+postgresql://<POSTGRES_USER>:<POSTGRES_PASSWORD>@<host>:5432/<POSTGRES_DB>
+# local dev example:
+postgresql://biowallet:your_password@localhost:5432/biowallet
 ```
+
+Use `localhost` when running the API on your host (`yarn dev:backend`); the Docker Compose stack overrides the host to `postgres` (the service name) automatically. The user, password, and database name must match the `POSTGRES_*` values in `.env`.
+
+The Ethereum RPC defaults to the **Sepolia testnet** — this is a concept project and is not meant for mainnet funds.
 
 ### Running
 
-```bash
-# Development
-npm run dev
+Start each service in its own terminal:
 
-# Production
-npm run build && npm start
+```bash
+yarn dev:backend   # Express API      → http://localhost:3001  (health: /health)
+yarn dev:web       # Next.js web app  → http://localhost:12000
+yarn dev:mobile    # Expo (React Native)
 ```
+
+Or run the full stack (Postgres + backend + web) in containers:
+
+```bash
+yarn docker:up     # start everything
+yarn docker:down   # tear it down
+```
+
+Other useful scripts: `yarn prisma:studio` (browse the DB), `yarn test` (Jest), `yarn build:web` / `yarn build:backend`.
 
 ## Project Structure
 
-```
+```text
 BioWallet/
-├── src/
-│   ├── app/              # Application routes
-│   ├── components/
-│   │   ├── wallet/       # Wallet UI components
-│   │   ├── auth/         # Authentication screens
-│   │   └── portfolio/    # Asset tracking views
-│   ├── lib/
-│   │   ├── webauthn/     # WebAuthn registration & auth
-│   │   ├── crypto/       # Key management & signing
-│   │   ├── chains/       # Blockchain interaction
-│   │   └── recovery/     # Social recovery logic
-│   └── types/            # TypeScript definitions
-├── tests/                # Test suites
+├── apps/
+│   ├── web/              # Next.js web app (WebAuthn + wallet UI)
+│   └── mobile/           # React Native (Expo) app
+├── backend/
+│   ├── api/              # Express API (Prisma, ethers)
+│   └── db/               # Prisma schema & migrations
+├── packages/
+│   ├── biometric-core/   # WebAuthn registration & auth logic
+│   ├── wallet-core/      # Key management & transaction signing
+│   ├── shared-ui/        # Shared React components / design system
+│   └── utils/            # Shared types & helpers
+├── docker-compose.yml    # Postgres + backend + web
+├── turbo.json            # Turborepo task pipeline
 └── docs/                 # Architecture & security docs
 ```
 
