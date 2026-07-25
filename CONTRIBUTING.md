@@ -54,17 +54,23 @@ Go to the original repository on GitHub. You'll see a **Compare & pull request**
 
 ## Development Setup
 
+BioWallet is a **Yarn workspaces + Turborepo monorepo** (Yarn 1 Classic, not npm) with a PostgreSQL database run via Docker.
+
 1. Fork and clone the repo (see above)
-2. Install dependencies:
+2. Follow the **[Quick Start in the README](./README.md#quick-start)** for the full, tested setup — in short:
    ```bash
-   # Check the README or package.json / requirements.txt / etc.
-   # for project-specific setup instructions
+   yarn install                              # install all workspaces
+   cp .env.example .env                      # + backend/api/.env and apps/web/.env.local
+   yarn docker:up                            # start PostgreSQL
+   yarn prisma:generate && yarn prisma:migrate
+   yarn dev:backend   # API  → http://localhost:3001
+   yarn dev:web       # web  → http://localhost:12000
    ```
 3. Create a branch for your work
 4. Make changes and test them locally
-5. Ensure existing tests pass before submitting
+5. Run `yarn test` and ensure existing tests pass before submitting
 
-> **Note:** Setup instructions may vary by project. Check the repository's README for specific details.
+> **Note:** The README's Quick Start is the source of truth for setup — keep it and this section in sync when either changes.
 
 ## Code Style Guidelines
 
