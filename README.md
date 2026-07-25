@@ -273,6 +273,16 @@ Configuration is split across three env files, each with a committed `*.example`
 | `backend/api/.env` | API server | `PORT`, `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGIN`, `ADMIN_API_KEY`, `ETHEREUM_RPC_URL`, `ETHEREUM_NETWORK` |
 | `apps/web/.env.local` | Web app | `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_RPC_URL` |
 
+Both `.env` and `backend/api/.env` contain a `DATABASE_URL`, and they must point at the same database. The canonical format is:
+
+```text
+postgresql://<POSTGRES_USER>:<POSTGRES_PASSWORD>@<host>:5432/<POSTGRES_DB>
+# local dev example:
+postgresql://biowallet:your_password@localhost:5432/biowallet
+```
+
+Use `localhost` when running the API on your host (`yarn dev:backend`); the Docker Compose stack overrides the host to `postgres` (the service name) automatically. The user, password, and database name must match the `POSTGRES_*` values in `.env`.
+
 The Ethereum RPC defaults to the **Sepolia testnet** — this is a concept project and is not meant for mainnet funds.
 
 ### Running
