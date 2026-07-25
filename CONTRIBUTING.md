@@ -60,12 +60,18 @@ BioWallet is a **Yarn workspaces + Turborepo monorepo** (Yarn 1 Classic, not npm
 2. Follow the **[Quick Start in the README](./README.md#quick-start)** for the full, tested setup — in short:
    ```bash
    yarn install                              # install all workspaces
-   cp .env.example .env                      # + backend/api/.env and apps/web/.env.local
+   cp .env.example .env
+   cp backend/api/.env.example backend/api/.env
+   cp apps/web/.env.example apps/web/.env.local
    yarn docker:up                            # start PostgreSQL
    yarn prisma:generate && yarn prisma:migrate
    yarn dev:backend   # API  → http://localhost:3001
    yarn dev:web       # web  → http://localhost:12000
    ```
+
+   > **Keep `POSTGRES_PASSWORD` in sync:** the value in `.env` must match the
+   > password inside `backend/api/.env`'s `DATABASE_URL`, or the API can't
+   > connect to Postgres. Replace every `CHANGE_ME_*` placeholder before starting.
 3. Create a branch for your work
 4. Make changes and test them locally
 5. Run `yarn test` and ensure existing tests pass before submitting

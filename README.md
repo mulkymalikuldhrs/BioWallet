@@ -296,7 +296,7 @@ Other useful scripts: `yarn prisma:studio` (browse the DB), `yarn test` (Jest), 
 
 ## Project Structure
 
-```
+```text
 BioWallet/
 ├── apps/
 │   ├── web/              # Next.js web app (WebAuthn + wallet UI)
