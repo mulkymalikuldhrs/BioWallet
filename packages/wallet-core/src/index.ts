@@ -101,15 +101,17 @@ export async function getTransactionHistory(
     for (let i = 0; i < 5; i++) {
       if (blockNumber - i < 0) break;
       const block = await provider.getBlock(blockNumber - i);
-      if (block && block.prefetchedTransactions) {
+      if (block && block.transactions.length > 0) {
         blocks.push(block);
       }
     }
-    
+
     const transactions = [];
     for (const block of blocks) {
       if (!block) continue;
-      for (const txHash of block.prefetchedTransactions || []) {
+      // block.transactions is an array of transaction hashes (the block was
+      // fetched without prefetching), so look each one up individually.
+      for (const txHash of block.transactions) {
         const tx = await provider.getTransaction(txHash);
         if (tx && (tx.from.toLowerCase() === addressLower || tx.to?.toLowerCase() === addressLower)) {
           transactions.push(tx);

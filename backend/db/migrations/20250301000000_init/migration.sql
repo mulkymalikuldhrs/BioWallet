@@ -2,10 +2,10 @@
 -- This migration sets up the complete BioWallet database schema
 
 -- CreateEnum
-CREATE TYPE "BiometricType" AS VALUE ('FINGERPRINT', 'FACE', 'IRIS');
-CREATE TYPE "TransactionType" AS VALUE ('SEND', 'RECEIVE');
-CREATE TYPE "TransactionStatus" AS VALUE ('PENDING', 'CONFIRMED', 'FAILED');
-CREATE TYPE "RewardStatus" AS VALUE ('PENDING', 'PAID', 'FAILED');
+CREATE TYPE "BiometricType" AS ENUM ('FINGERPRINT', 'FACE', 'IRIS');
+CREATE TYPE "TransactionType" AS ENUM ('SEND', 'RECEIVE');
+CREATE TYPE "TransactionStatus" AS ENUM ('PENDING', 'CONFIRMED', 'FAILED');
+CREATE TYPE "RewardStatus" AS ENUM ('PENDING', 'PAID', 'FAILED');
 
 -- CreateTable
 CREATE TABLE "User" (
