@@ -24,7 +24,7 @@
     "wallet-core": "*"
   },
   "devDependencies": {
-    "@types/node": "^20.17.19",
+    "@types/node": "^25.9.3",
     "@types/react": "19.0.0",
     "@types/react-dom": "19.0.0",
     "autoprefixer": "^10.4.24",
