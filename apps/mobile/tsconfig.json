@@ -1,0 +1,14 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
+    "paths": {
+      "wallet-core": ["../../packages/wallet-core/src"],
+      "biometric-core": ["../../packages/biometric-core/src"],
+      "shared-ui": ["../../packages/shared-ui/src"],
+      "utils": ["../../packages/utils/src"]
+    }
+  }
+}
