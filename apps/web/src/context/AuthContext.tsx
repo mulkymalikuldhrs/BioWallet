@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   };
 
-  const register = async (walletAddress: string, _publicKey: string, credentialId: string): Promise<boolean> => {
+  const register = async (walletAddress: string, publicKey: string, credentialId: string): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
