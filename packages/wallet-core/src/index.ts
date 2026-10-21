@@ -109,8 +109,9 @@ export async function getTransactionHistory(
     const transactions = [];
     for (const block of blocks) {
       if (!block) continue;
-      for (const txHash of block.prefetchedTransactions || []) {
-        const tx = await provider.getTransaction(txHash);
+      for (const txItem of block.prefetchedTransactions || []) {
+        const hash = typeof txItem === 'string' ? txItem : txItem.hash;
+        const tx = typeof txItem === 'string' ? await provider.getTransaction(hash) : txItem;
         if (tx && (tx.from.toLowerCase() === addressLower || tx.to?.toLowerCase() === addressLower)) {
           transactions.push(tx);
         }
