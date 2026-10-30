@@ -1,8 +1,10 @@
+import { safeLocalStorage } from '../lib/safeLocalStorage';
 import { createContext, useState, useContext, useEffect, useCallback, ReactNode } from 'react';
 import { ethers } from 'ethers';
 import { generateWalletFromBiometric as coreGenerateWallet } from 'wallet-core';
 import type { WalletContextType } from 'utils';
-import { safeLocalStorage } from '@/lib/safeLocalStorage';
+
+// SSR-safe localStorage wrapper
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 

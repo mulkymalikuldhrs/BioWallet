@@ -1,9 +1,9 @@
 import express from 'express';
-import { prisma } from '../index';
-import { generateToken } from '../middleware/auth';
-import { strictRateLimiter } from '../middleware/rateLimiter';
-import { validateBody } from '../validators/middleware';
-import { loginSchema } from '../validators/schemas';
+import { prisma } from '../index.js';
+import { generateToken } from '../middleware/auth.js';
+import { strictRateLimiter } from '../middleware/rateLimiter.js';
+import { validateBody } from '../validators/middleware.js';
+import { loginSchema } from '../validators/schemas.js';
 
 const router = express.Router();
 

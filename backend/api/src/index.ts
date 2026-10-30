@@ -4,12 +4,12 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
-import authRoutes from './routes/authRoutes';
-import userRoutes from './routes/userRoutes';
-import walletRoutes from './routes/walletRoutes';
-import transactionRoutes from './routes/transactionRoutes';
-import adminRoutes from './routes/adminRoutes';
-import { defaultRateLimiter } from './middleware/rateLimiter';
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import walletRoutes from './routes/walletRoutes.js';
+import transactionRoutes from './routes/transactionRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import { defaultRateLimiter } from './middleware/rateLimiter.js';
 
 dotenv.config();
 
@@ -86,7 +86,7 @@ app.use(defaultRateLimiter);
 
 // Health check (no auth required)
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok', version: '3.0.0', network: 'sepolia' });
+  res.status(200).json({ status: 'ok', version: '3.1.0', network: 'sepolia' });
 });
 
 // Routes
