@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { ethers } from 'ethers';
-import { prisma } from '../index';
+import { prisma } from '../index.js';
 import { BiometricType, Prisma } from '@prisma/client';
-import { generateToken } from '../middleware/auth';
+import { generateToken } from '../middleware/auth.js';
 
 // Provider for Ethereum testnet (Sepolia)
 const provider = new ethers.JsonRpcProvider(process.env.ETHEREUM_RPC_URL || 'https://rpc.ankr.com/eth_sepolia');
