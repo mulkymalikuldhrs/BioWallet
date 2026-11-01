@@ -153,7 +153,12 @@ const RegisterScreen: React.FC = () => {
               ]}
             >
               <Ionicons
-                name={biometricType === 'Face ID' ? 'scan-outline' : 'finger-print-outline'}
+                name={
+                  ({
+                    'Face ID': 'scan-outline',
+                    'Iris': 'eye-outline',
+                  } as Record<string, keyof typeof Ionicons.prototype.props.name>)[biometricType] || 'finger-print-outline'
+                }
                 size={80}
                 color={colors.primary}
               />

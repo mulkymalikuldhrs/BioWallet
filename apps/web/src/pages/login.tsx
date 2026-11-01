@@ -1,3 +1,4 @@
+import { safeLocalStorage } from '../lib/safeLocalStorage';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
@@ -6,7 +7,8 @@ import { useWallet } from '@/context/WalletContext';
 import { MdFingerprint } from 'react-icons/md';
 import { ethers } from 'ethers';
 import { extractEntropy } from 'utils';
-import { safeLocalStorage } from '@/lib/safeLocalStorage';
+
+// SSR-safe localStorage wrapper
 
 export default function Login() {
   const router = useRouter();
